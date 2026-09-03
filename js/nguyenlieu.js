@@ -1,0 +1,57 @@
+// Khai báo nguyên liệu gốc
+const KHO_MAC_DINH = [
+    { id: 'nl_cf', name: 'Cốt Cà phê', stock: 5000, unit: 'ml' },
+    { id: 'nl_matcha_dai', name: 'Matcha Đài', stock: 1000, unit: 'g' },
+    { id: 'nl_matcha_mk4', name: 'Matcha MK4', stock: 1000, unit: 'g' },
+    { id: 'nl_cacao', name: 'Bột Cacao', stock: 1000, unit: 'g' },
+    { id: 'nl_khoaimon', name: 'Bột Khoai môn', stock: 1000, unit: 'g' },
+    { id: 'nl_suadac', name: 'Sữa Đặc', stock: 5000, unit: 'ml' },
+    { id: 'nl_sua_mlekovita', name: 'Sữa Mlekovita', stock: 10000, unit: 'ml' },
+    { id: 'nl_sua_oatside', name: 'Sữa Oatside', stock: 5000, unit: 'ml' },
+    { id: 'nl_rich', name: 'Rich Lùn', stock: 5000, unit: 'ml' },
+    { id: 'nl_duong', name: 'Đường', stock: 5000, unit: 'ml' },
+    { id: 'nl_kemmuoi', name: 'Kem Muối', stock: 200000, unit: 'ml' },
+    { id: 'nl_kemdeo', name: 'Kem Dẻo', stock: 200000, unit: 'ml' },
+    { id: 'nl_ly_m', name: 'Ly M', stock: 500, unit: 'cái' },
+    { id: 'nl_ly_l', name: 'Ly L', stock: 500, unit: 'cái' },
+    { id: 'nl_tc_den', name: 'Trân châu đen', stock: 200000, unit: 'g' },
+    { id: 'nl_tc_3q', name: 'Trân châu 3Q', stock: 200000, unit: 'g' },
+    { id: 'nl_cunang', name: 'Thạch củ năng', stock: 200000, unit: 'g' },
+    { id: 'nl_daomieng', name: 'Đào miếng', stock: 200000, unit: 'miếng' },
+    { id: 'nl_vaimieng', name: 'Vải Miếng', stock: 200000, unit: 'miếng' },
+    { id: 'nl_thachcf', name: 'Thạch cà phê', stock: 200000, unit: 'g' },
+    { id: 'nl_trasua', name: 'Cốt Trà Sữa', stock: 5000, unit: 'ml' },
+    { id: 'nl_tralai', name: 'Cốt Trà Lài', stock: 5000, unit: 'ml' },
+    { id: 'nl_tradao', name: 'Cốt Trà Đào', stock: 5000, unit: 'ml' },
+    { id: 'nl_traden', name: 'Cốt Trà Đen', stock: 5000, unit: 'ml' },
+    { id: 'nl_dau', name: 'Mứt Dâu', stock: 5000, unit: 'ml' },
+    { id: 'nl_syrupdao', name: 'Syrup Đào', stock: 5000, unit: 'ml' },
+    { id: 'nl_chunkyvai', name: 'ChunKy Vải Hoa Hồng', stock: 5000, unit: 'ml' },
+    { id: 'nl_caramel', name: 'Sốt Caramel', stock: 5000, unit: 'ml' },
+    { id: 'nl_sirohn', name: 'Siro Hạnh Nhân', stock: 5000, unit: 'ml' },
+    { id: 'nl_oreo', name: 'Bánh Oreo', stock: 5000, unit: 'cái' },
+    { id: 'nl_sirobh', name: 'Siro Bạc Hà', stock: 5000, unit: 'ml' },
+    { id: 'nl_tac', name: 'Tắc', stock: 5000, unit: 'trái' },
+    { id: 'nl_nuoc_cam', name: 'Nước Cam', stock: 5000, unit: 'ml' },
+    { id: 'nl_nuoc_am', name: 'Nước Ấm', stock: 500000, unit: 'ml' }
+];
+
+// Khai báo Addons
+const ADDONS = {
+    sua: {
+        mac_dinh: { id: 'nl_sua_mlekovita', name: 'Sữa Mlekovita', price: 0 },
+        doi_sua: { id: 'nl_sua_oatside', name: 'Sữa Oatside', price: 5000 }
+    },
+    matcha: {
+        mac_dinh: { id: 'nl_matcha_dai', name: 'Matcha Đài', price: 0 },
+        doi_matcha: { id: 'nl_matcha_mk4', name: 'Matcha MK4', price: 10000 }
+    },
+    topping: [
+        { id: 'nl_tc_den', name: 'Trân châu đen', price: 5000, qty: 30 },
+        { id: 'nl_tc_3q', name: 'Trân châu 3Q', price: 5000, qty: 30 },
+        { id: 'nl_cunang', name: 'Thạch củ năng', price: 5000, qty: 30 },
+        { id: 'nl_suongsao', name: 'Sương sáo', price: 5000, qty: 30 },
+        { id: 'nl_kemmuoi', name: 'Kem muối', price: 5000, qty: 30 },
+        { id: 'nl_kemdeo', name: 'Kem dẻo', price: 5000, qty: 30 }
+    ]
+};

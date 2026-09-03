@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Han.Kafé POS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div id="app">
+        <!-- HEADER -->
+        <header class="header">
+            <h1>Han.Kafé</h1>
+        </header>
+
+        <!-- TAB 1: BÁN HÀNG -->
+        <main id="tab-sales" class="tab-content active">
+            <div class="menu-categories">
+                <!-- Categories will be generated dynamically -->
+            </div>
+
+            <div id="menu-grid" class="menu-grid">
+                <!-- Menu items will be generated here -->
+            </div>
+        </main>
+
+        <!-- CART DRAWER / SIDEBAR -->
+        <div id="cart-drawer" class="cart-drawer">
+            <div class="cart-header">
+                <h2>Giỏ hàng (<span id="cart-count">0</span>)</h2>
+                <button id="close-cart-btn" class="close-btn"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="cart-items" class="cart-items">
+                <!-- Cart items go here -->
+            </div>
+            <div class="cart-footer">
+                <div class="discount-box">
+                    <input type="text" id="discount-input" placeholder="Khuyến mãi (VD: 10% hoặc 5000)">
+                    <button id="apply-discount-btn">Áp dụng</button>
+                </div>
+                <div class="cart-total-row">
+                    <span>Tổng tiền:</span>
+                    <span id="cart-total" class="price">0đ</span>
+                </div>
+                <button id="checkout-btn" class="checkout-btn">Thanh Toán</button>
+            </div>
+        </div>
+
+        <!-- CART TOGGLE BUTTON (MOBILE) -->
+        <button id="cart-toggle-btn" class="floating-cart-btn">
+            <i class="fas fa-shopping-cart"></i>
+            <span id="floating-cart-count" class="badge">0</span>
+        </button>
+
+        <!-- TAB 2: KHO & DOANH THU -->
+        <main id="tab-inventory" class="tab-content">
+            <div class="dashboard-cards">
+                <div class="card bg-gradient-primary">
+                    <h3>Tổng Thu</h3>
+                    <p id="total-revenue">0đ</p>
+                </div>
+                <div class="card bg-gradient-secondary">
+                    <h3>Ly Đã Bán</h3>
+                    <p id="total-cups">0</p>
+                </div>
+            </div>
+
+            <div class="section-header mt-20" style="margin-top: 20px;">
+                <h2>Chi Tiết Bán Hàng</h2>
+            </div>
+            <div id="sales-detail-list" class="inventory-list" style="margin-bottom: 20px; background: #fff; border-radius: 12px; padding: 10px;">
+                <!-- Detailed sales will be rendered here -->
+            </div>
+
+            <div class="section-header">
+                <h2>Tồn Kho Nguyên Liệu</h2>
+                <button id="save-inventory-btn" class="btn-primary">Lưu Tồn Kho</button>
+            </div>
+
+            <div id="inventory-list" class="inventory-list">
+                <!-- Inventory rows generated here -->
+            </div>
+
+            <button id="close-shift-btn" class="btn-danger full-width mt-20">Chốt Ca & Reset Báo Cáo</button>
+        </main>
+
+        <!-- BOTTOM NAVIGATION -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" data-target="tab-sales">
+                <i class="fas fa-coffee"></i>
+                <span>Bán Hàng</span>
+            </button>
+            <button class="nav-btn" data-target="tab-inventory">
+                <i class="fas fa-box"></i>
+                <span>Kho & Doanh Thu</span>
+            </button>
+        </nav>
+
+        <!-- MODAL FOR ADDONS -->
+        <div id="addon-modal" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modal-drink-name">Chọn Tuỳ Chọn</h3>
+                    <button id="close-modal-btn" class="close-btn"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div id="milk-options" class="addon-group hidden">
+                        <h4>Đổi Sữa</h4>
+                        <div class="radio-group" id="milk-radio-group">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <div id="matcha-options" class="addon-group hidden">
+                        <h4>Đổi Matcha</h4>
+                        <div class="radio-group" id="matcha-radio-group">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <div id="topping-options" class="addon-group">
+                        <h4>Topping Thêm (5.000đ)</h4>
+                        <div class="checkbox-group" id="topping-checkbox-group">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="add-to-cart-modal-btn" class="btn-primary full-width">Thêm vào giỏ</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOAST NOTIFICATION -->
+        <div id="toast" class="toast">Đã thêm vào giỏ hàng</div>
+    </div>
+
+    <script src="js/nguyenlieu.js"></script>
+    <script src="js/menu.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
