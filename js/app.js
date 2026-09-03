@@ -24,10 +24,11 @@ function initData() {
 
     let baocao = JSON.parse(localStorage.getItem('POS_BAOCAO'));
     if (!baocao) {
-        baocao = { tongThu: 0, tongLy: 0, chiTietBan: {} };
+        baocao = { tongThu: 0, tongLy: 0, chiTietBan: {}, orders: [] };
         localStorage.setItem('POS_BAOCAO', JSON.stringify(baocao));
-    } else if (!baocao.chiTietBan) {
-        baocao.chiTietBan = {};
+    } else {
+        if (!baocao.chiTietBan) baocao.chiTietBan = {};
+        if (!baocao.orders) baocao.orders = [];
         localStorage.setItem('POS_BAOCAO', JSON.stringify(baocao));
     }
 }
@@ -344,6 +345,12 @@ window.changeQty = function(index, delta) {
     renderCart();
 }
 
+window.removeItem = function(index) {
+    gioHang.splice(index, 1);
+    updateVirtualStock();
+    renderCart();
+}
+
 function renderCart() {
     cartItemsContainer.innerHTML = '';
     let totalQty = 0;
@@ -369,9 +376,10 @@ function renderCart() {
             <div class="cart-item-controls">
                 <div class="qty-control">
                     <button class="qty-btn" onclick="changeQty(${index}, -1)">-</button>
-                    <span>${cItem.qty}</span>
+                    <span style="font-size:1.2rem; font-weight:bold; min-width: 20px; text-align:center;">${cItem.qty}</span>
                     <button class="qty-btn" onclick="changeQty(${index}, 1)">+</button>
                 </div>
+                <button class="delete-btn" onclick="removeItem(${index})"><i class="fas fa-trash"></i></button>
             </div>
             <button class="accordion-btn" onclick="toggleAccordion(this)">
                 Công thức (1 ly) <i class="fas fa-chevron-down"></i>
@@ -402,6 +410,8 @@ function renderCart() {
     cartTotalEl.textContent = `${finalTotal.toLocaleString('vi-VN')}đ`;
     cartCount.textContent = totalQty;
     floatingCartCount.textContent = totalQty;
+
+
 }
 
 window.toggleAccordion = function(btn) {
@@ -454,6 +464,16 @@ document.getElementById('checkout-btn').onclick = () => {
         }
         report.chiTietBan[key] += item.qty;
     });
+    
+    const orderObj = {
+        id: Date.now(),
+        time: new Date().toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'}),
+        total: finalTotal,
+        items: gioHang.map(i => ({...i}))
+    };
+    if(!report.orders) report.orders = [];
+    report.orders.unshift(orderObj);
+    if (report.orders.length > 30) report.orders.pop();
     
     localStorage.setItem('POS_BAOCAO', JSON.stringify(report));
 
@@ -514,6 +534,29 @@ function renderInventory() {
         }
     }
 
+    const recentOrdersList = document.getElementById('recent-orders-list');
+    if (recentOrdersList) {
+        recentOrdersList.innerHTML = '';
+        const orders = report.orders || [];
+        if (orders.length === 0) {
+            recentOrdersList.innerHTML = '<div style="padding: 10px; color: #888;">Chưa có đơn hàng nào.</div>';
+        } else {
+            orders.forEach(order => {
+                const itemSummary = order.items.map(i => `${i.qty}x ${i.item.name}`).join(', ');
+                recentOrdersList.innerHTML += `
+                    <div class="order-history-item">
+                        <div class="order-info">
+                            <span class="order-time"><i class="far fa-clock"></i> ${order.time}</span>
+                            <span style="font-size: 0.9rem;">${itemSummary}</span>
+                            <span class="order-total">${order.total.toLocaleString('vi-VN')}đ</span>
+                        </div>
+                        <button class="btn-void" onclick="voidOrder(${order.id})">Hủy</button>
+                    </div>
+                `;
+            });
+        }
+    }
+
     const list = document.getElementById('inventory-list');
     list.innerHTML = '';
 
@@ -555,3 +598,90 @@ document.getElementById('close-shift-btn').onclick = () => {
 renderCategories();
 renderMenu();
 renderCart();
+
+// --- VOID ORDER ---
+window.voidOrder = function(orderId) {
+    if(!confirm('Bạn có chắc chắn muốn hủy đơn này và hoàn nguyên liệu?')) return;
+    
+    let report = JSON.parse(localStorage.getItem('POS_BAOCAO'));
+    let orders = report.orders || [];
+    const orderIndex = orders.findIndex(o => o.id === orderId);
+    if(orderIndex === -1) return alert('Không tìm thấy đơn hàng!');
+    
+    const order = orders[orderIndex];
+    
+    report.tongThu -= order.total;
+    if(report.tongThu < 0) report.tongThu = 0;
+    
+    let totalCups = order.items.reduce((sum, item) => sum + item.qty, 0);
+    report.tongLy -= totalCups;
+    if(report.tongLy < 0) report.tongLy = 0;
+    
+    order.items.forEach(item => {
+        let key = `${item.item.name} - Size ${item.size}`;
+        if (item.addonText) key += ` (+ ${item.addonText})`;
+        
+        if (report.chiTietBan[key]) {
+            report.chiTietBan[key] -= item.qty;
+            if(report.chiTietBan[key] <= 0) delete report.chiTietBan[key];
+        }
+    });
+    
+    let currentActualStock = JSON.parse(localStorage.getItem('POS_KHO'));
+    order.items.forEach(item => {
+        const recipe = item.recipe;
+        for (let nl in recipe) {
+            if(currentActualStock[nl]) {
+                currentActualStock[nl].stock += (recipe[nl] * item.qty);
+            }
+        }
+    });
+    localStorage.setItem('POS_KHO', JSON.stringify(currentActualStock));
+    khoHienTai = currentActualStock;
+    
+    orders.splice(orderIndex, 1);
+    report.orders = orders;
+    
+    localStorage.setItem('POS_BAOCAO', JSON.stringify(report));
+    
+    updateVirtualStock();
+    renderInventory();
+    alert('Hủy đơn thành công!');
+}
+
+// --- WAKE LOCK API ---
+let wakeLock = null;
+async function requestWakeLock() {
+    try {
+        if ('wakeLock' in navigator) {
+            wakeLock = await navigator.wakeLock.request('screen');
+            wakeLock.addEventListener('release', () => {
+                console.log('Screen Wake Lock released');
+            });
+            console.log('Screen Wake Lock acquired');
+        }
+    } catch (err) {
+        console.error(`${err.name}, ${err.message}`);
+    }
+}
+// Yêu cầu giữ màn hình sáng khi load app
+requestWakeLock();
+document.addEventListener('visibilitychange', () => {
+    if (wakeLock !== null && document.visibilityState === 'visible') {
+        requestWakeLock();
+    }
+});
+
+
+window.toggleSection = function(id, btn) {
+    const el = document.getElementById(id);
+    const icon = btn.querySelector('i');
+    if (el.style.display === 'none') {
+        el.style.display = '';
+        icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+    } else {
+        el.style.display = 'none';
+        icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+    }
+}
+

@@ -46,6 +46,7 @@
                     <span>Tổng tiền:</span>
                     <span id="cart-total" class="price">0đ</span>
                 </div>
+
                 <button id="checkout-btn" class="checkout-btn">Thanh Toán</button>
             </div>
         </div>
@@ -71,14 +72,26 @@
 
             <div class="section-header mt-20" style="margin-top: 20px;">
                 <h2>Chi Tiết Bán Hàng</h2>
+                <button class="collapse-btn" onclick="toggleSection('sales-detail-list', this)"><i class="fas fa-chevron-up"></i></button>
             </div>
             <div id="sales-detail-list" class="inventory-list" style="margin-bottom: 20px; background: #fff; border-radius: 12px; padding: 10px;">
                 <!-- Detailed sales will be rendered here -->
             </div>
 
+            <div class="section-header mt-20">
+                <h2>Đơn Hàng Gần Đây</h2>
+                <button class="collapse-btn" onclick="toggleSection('recent-orders-list', this)"><i class="fas fa-chevron-up"></i></button>
+            </div>
+            <div id="recent-orders-list" class="inventory-list" style="margin-bottom: 20px; background: #fff; border-radius: 12px; padding: 10px;">
+                <!-- Lịch sử hóa đơn sẽ được render tại đây -->
+            </div>
+
             <div class="section-header">
                 <h2>Tồn Kho Nguyên Liệu</h2>
-                <button id="save-inventory-btn" class="btn-primary">Lưu Tồn Kho</button>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button id="save-inventory-btn" class="btn-primary">Lưu Tồn Kho</button>
+                    <button class="collapse-btn" onclick="toggleSection('inventory-list', this)"><i class="fas fa-chevron-up"></i></button>
+                </div>
             </div>
 
             <div id="inventory-list" class="inventory-list">

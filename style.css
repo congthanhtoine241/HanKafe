@@ -298,12 +298,12 @@ body {
 .qty-control {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.8rem;
 }
 
 .qty-btn {
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     border: 1px solid var(--border-color);
     background: white;
@@ -311,6 +311,48 @@ body {
     align-items: center;
     justify-content: center;
     font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.delete-btn {
+    background: #fef2f2;
+    color: var(--danger);
+    border: 1px solid #fecaca;
+    width: 40px;
+    height: 40px;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+
+.order-history-item {
+    padding: 10px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.order-history-item:last-child {
+    border-bottom: none;
+}
+.order-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.order-time { font-size: 0.8rem; color: var(--text-muted); }
+.order-total { font-weight: bold; color: var(--text-main); }
+.btn-void {
+    background: var(--danger);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.4rem;
+    font-weight: 600;
 }
 
 .item-price {
@@ -627,3 +669,18 @@ body {
 .toast.show {
     transform: translateX(-50%) translateY(0);
 }
+
+
+.collapse-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: transform 0.2s;
+}
+.collapse-btn:active {
+    transform: scale(0.9);
+}
+
