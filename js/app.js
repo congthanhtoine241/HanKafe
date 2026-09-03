@@ -52,11 +52,11 @@ const discountInput = document.getElementById('discount-input');
 
 // --- TÍNH TOÁN KHO ẢO ---
 function getIngredientName(id) {
-    if(khoHienTai[id]) return khoHienTai[id].name;
+    if (khoHienTai[id]) return khoHienTai[id].name;
     return id;
 }
 function getIngredientUnit(id) {
-    if(khoHienTai[id]) return khoHienTai[id].unit;
+    if (khoHienTai[id]) return khoHienTai[id].unit;
     return '';
 }
 
@@ -92,7 +92,7 @@ function renderCategories() {
 function renderMenu() {
     menuGrid.innerHTML = '';
     const items = MENU.filter(m => m.category === currentCategory);
-    
+
     items.forEach(item => {
         // Calculate max cups for M and L
         let maxM = 0;
@@ -103,7 +103,7 @@ function renderMenu() {
         if (item.price.L) {
             maxL = calcMaxCups(item.congThuc.L);
         }
-        
+
         let totalAvail = maxM + maxL;
         const outOfStock = totalAvail <= 0;
 
@@ -125,9 +125,9 @@ function renderMenu() {
 // --- XỬ LÝ CLICK MÓN ---
 let tempSelectedItem = null;
 
-window.handleMenuClick = function(itemId, size) {
+window.handleMenuClick = function (itemId, size) {
     const item = MENU.find(m => m.id === itemId);
-    
+
     if (item.hasAddonSua || item.hasAddonMatcha || ['Cacao', 'Matcha', 'Khoai môn'].includes(item.category)) {
         // Open Modal
         tempSelectedItem = { item, size };
@@ -149,7 +149,7 @@ const toppingCheckboxes = document.getElementById('topping-checkbox-group');
 
 function openAddonModal(item, size) {
     document.getElementById('modal-drink-name').textContent = `${item.name} (Size ${size})`;
-    
+
     // Reset Modal state
     milkRadios.innerHTML = '';
     matchaRadios.innerHTML = '';
@@ -203,19 +203,19 @@ function openAddonModal(item, size) {
 closeBtn.onclick = () => addonModal.classList.remove('active');
 
 document.getElementById('add-to-cart-modal-btn').onclick = () => {
-    if(!tempSelectedItem) return;
-    
+    if (!tempSelectedItem) return;
+
     let addonSua = null;
     let addonMatcha = null;
     let toppings = [];
 
-    if(tempSelectedItem.item.hasAddonSua) {
+    if (tempSelectedItem.item.hasAddonSua) {
         const val = document.querySelector('input[name="milk"]:checked').value;
-        if(val === 'doi_sua') addonSua = ADDONS.sua.doi_sua;
+        if (val === 'doi_sua') addonSua = ADDONS.sua.doi_sua;
     }
-    if(tempSelectedItem.item.hasAddonMatcha) {
+    if (tempSelectedItem.item.hasAddonMatcha) {
         const val = document.querySelector('input[name="matcha"]:checked').value;
-        if(val === 'doi_matcha') addonMatcha = ADDONS.matcha.doi_matcha;
+        if (val === 'doi_matcha') addonMatcha = ADDONS.matcha.doi_matcha;
     }
 
     const tChecked = document.querySelectorAll('input[name="topping"]:checked');
@@ -237,7 +237,7 @@ document.getElementById('add-to-cart-modal-btn').onclick = () => {
 function calculateRealRecipe(item, size, addonsData) {
     // Clone recipe for 1 cup
     let recipe = { ...item.congThuc[size] };
-    
+
     // Override Milk
     if (addonsData.sua) {
         let amount = recipe['nl_sua_mlekovita'] || 0;
@@ -266,19 +266,19 @@ function calculateRealRecipe(item, size, addonsData) {
 
 function addToCart(item, size, addonsData) {
     const realRecipe = calculateRealRecipe(item, size, addonsData);
-    
+
     // Check virtual stock before adding
     let max = calcMaxCups(realRecipe);
-    if(max <= 0) {
+    if (max <= 0) {
         alert('Kho không đủ nguyên liệu cho tùy chọn này!');
         return;
     }
 
     let price = item.price[size];
     let addonText = [];
-    if(addonsData.sua) { price += addonsData.sua.price; addonText.push(addonsData.sua.name); }
-    if(addonsData.matcha) { price += addonsData.matcha.price; addonText.push(addonsData.matcha.name); }
-    if(addonsData.toppings && addonsData.toppings.length > 0) {
+    if (addonsData.sua) { price += addonsData.sua.price; addonText.push(addonsData.sua.name); }
+    if (addonsData.matcha) { price += addonsData.matcha.price; addonText.push(addonsData.matcha.name); }
+    if (addonsData.toppings && addonsData.toppings.length > 0) {
         addonsData.toppings.forEach(t => {
             price += t.price;
             addonText.push(t.name);
@@ -312,12 +312,12 @@ function addToCart(item, size, addonsData) {
 function updateVirtualStock() {
     // Reset virtual stock to current actual stock
     khoAo = JSON.parse(JSON.stringify(khoHienTai));
-    
+
     // Subtract all items in cart
     gioHang.forEach(cartItem => {
         const recipe = cartItem.recipe;
         for (let nl in recipe) {
-            if(khoAo[nl]) {
+            if (khoAo[nl]) {
                 khoAo[nl].stock -= (recipe[nl] * cartItem.qty);
             }
         }
@@ -326,15 +326,15 @@ function updateVirtualStock() {
     renderMenu(); // Update menu buttons
 }
 
-window.changeQty = function(index, delta) {
+window.changeQty = function (index, delta) {
     let newQty = gioHang[index].qty + delta;
     if (newQty <= 0) {
         gioHang.splice(index, 1);
     } else {
         // Check if we can add more
-        if(delta > 0) {
+        if (delta > 0) {
             let max = calcMaxCups(gioHang[index].recipe);
-            if(max <= 0) {
+            if (max <= 0) {
                 alert('Kho không đủ nguyên liệu!');
                 return;
             }
@@ -345,7 +345,7 @@ window.changeQty = function(index, delta) {
     renderCart();
 }
 
-window.removeItem = function(index) {
+window.removeItem = function (index) {
     gioHang.splice(index, 1);
     updateVirtualStock();
     renderCart();
@@ -359,9 +359,9 @@ function renderCart() {
     gioHang.forEach((cItem, index) => {
         totalQty += cItem.qty;
         totalPrice += (cItem.price * cItem.qty);
-        
+
         let recipeHtml = '';
-        for(let id in cItem.recipe) {
+        for (let id in cItem.recipe) {
             recipeHtml += `<div class="recipe-line"><span>${getIngredientName(id)}</span> <span>${cItem.recipe[id]}${getIngredientUnit(id)}</span></div>`;
         }
 
@@ -394,18 +394,18 @@ function renderCart() {
     // Discount
     let finalTotal = totalPrice;
     let discVal = discountInput.value.trim();
-    if(discVal.endsWith('%')) {
+    if (discVal.endsWith('%')) {
         let percent = parseFloat(discVal);
-        if(!isNaN(percent)) {
-            finalTotal = totalPrice * (1 - percent/100);
+        if (!isNaN(percent)) {
+            finalTotal = totalPrice * (1 - percent / 100);
         }
     } else {
         let amt = parseFloat(discVal);
-        if(!isNaN(amt)) {
+        if (!isNaN(amt)) {
             finalTotal = totalPrice - amt;
         }
     }
-    if(finalTotal < 0) finalTotal = 0;
+    if (finalTotal < 0) finalTotal = 0;
 
     cartTotalEl.textContent = `${finalTotal.toLocaleString('vi-VN')}đ`;
     cartCount.textContent = totalQty;
@@ -414,11 +414,11 @@ function renderCart() {
 
 }
 
-window.toggleAccordion = function(btn) {
+window.toggleAccordion = function (btn) {
     const content = btn.nextElementSibling;
     content.classList.toggle('open');
     const icon = btn.querySelector('i');
-    if(content.classList.contains('open')) {
+    if (content.classList.contains('open')) {
         icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
     } else {
         icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
@@ -437,22 +437,22 @@ closeCartBtn.onclick = () => cartDrawer.classList.remove('open');
 
 // --- THANH TOÁN ---
 document.getElementById('checkout-btn').onclick = () => {
-    if(gioHang.length === 0) return alert('Giỏ hàng trống!');
-    
+    if (gioHang.length === 0) return alert('Giỏ hàng trống!');
+
     // Update actual stock
     khoHienTai = JSON.parse(JSON.stringify(khoAo));
     localStorage.setItem('POS_KHO', JSON.stringify(khoHienTai));
 
     // Update Report
     const report = JSON.parse(localStorage.getItem('POS_BAOCAO'));
-    
+
     // Recalc total for revenue
     let finalTotal = parseInt(cartTotalEl.textContent.replace(/[^0-9]/g, ''));
     let totalLy = gioHang.reduce((sum, item) => sum + item.qty, 0);
 
     report.tongThu += finalTotal;
     report.tongLy += totalLy;
-    
+
     if (!report.chiTietBan) report.chiTietBan = {};
     gioHang.forEach(item => {
         let key = `${item.item.name} - Size ${item.size}`;
@@ -464,21 +464,21 @@ document.getElementById('checkout-btn').onclick = () => {
         }
         report.chiTietBan[key] += item.qty;
     });
-    
+
     const orderObj = {
         id: Date.now(),
-        time: new Date().toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'}),
+        time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
         total: finalTotal,
-        items: gioHang.map(i => ({...i}))
+        items: gioHang.map(i => ({ ...i }))
     };
-    if(!report.orders) report.orders = [];
+    if (!report.orders) report.orders = [];
     report.orders.unshift(orderObj);
     if (report.orders.length > 30) report.orders.pop();
-    
+
     localStorage.setItem('POS_BAOCAO', JSON.stringify(report));
 
     alert('Thanh toán thành công!');
-    
+
     // Reset
     gioHang = [];
     discountInput.value = '';
@@ -501,11 +501,11 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        
+
         btn.classList.add('active');
         document.getElementById(btn.dataset.target).classList.add('active');
-        
-        if(btn.dataset.target === 'tab-inventory') {
+
+        if (btn.dataset.target === 'tab-inventory') {
             renderInventory();
         }
     });
@@ -577,7 +577,7 @@ function renderInventory() {
 document.getElementById('save-inventory-btn').onclick = () => {
     for (let key in khoHienTai) {
         const input = document.getElementById(`inv_${key}`);
-        if(input) {
+        if (input) {
             khoHienTai[key].stock = parseFloat(input.value) || 0;
         }
     }
@@ -586,8 +586,22 @@ document.getElementById('save-inventory-btn').onclick = () => {
     alert('Đã lưu tồn kho!');
 }
 
+document.getElementById('reset-inventory-btn').onclick = () => {
+    if (confirm('Bạn có chắc chắn muốn khôi phục số lượng tồn kho về mặc định (theo code)? Tất cả tồn kho hiện tại sẽ bị ghi đè!')) {
+        let defaultKho = {};
+        KHO_MAC_DINH.forEach(item => {
+            defaultKho[item.id] = { ...item };
+        });
+        localStorage.setItem('POS_KHO', JSON.stringify(defaultKho));
+        khoHienTai = defaultKho;
+        updateVirtualStock();
+        renderInventory();
+        alert('Đã khôi phục tồn kho mặc định thành công!');
+    }
+}
+
 document.getElementById('close-shift-btn').onclick = () => {
-    if(confirm('Bạn có chắc chắn chốt ca? (Doanh thu sẽ về 0, tồn kho vẫn giữ nguyên)')) {
+    if (confirm('Bạn có chắc chắn chốt ca? (Doanh thu sẽ về 0, tồn kho vẫn giữ nguyên)')) {
         localStorage.setItem('POS_BAOCAO', JSON.stringify({ tongThu: 0, tongLy: 0, chiTietBan: {} }));
         renderInventory();
         alert('Chốt ca thành công!');
@@ -600,50 +614,50 @@ renderMenu();
 renderCart();
 
 // --- VOID ORDER ---
-window.voidOrder = function(orderId) {
-    if(!confirm('Bạn có chắc chắn muốn hủy đơn này và hoàn nguyên liệu?')) return;
-    
+window.voidOrder = function (orderId) {
+    if (!confirm('Bạn có chắc chắn muốn hủy đơn này và hoàn nguyên liệu?')) return;
+
     let report = JSON.parse(localStorage.getItem('POS_BAOCAO'));
     let orders = report.orders || [];
     const orderIndex = orders.findIndex(o => o.id === orderId);
-    if(orderIndex === -1) return alert('Không tìm thấy đơn hàng!');
-    
+    if (orderIndex === -1) return alert('Không tìm thấy đơn hàng!');
+
     const order = orders[orderIndex];
-    
+
     report.tongThu -= order.total;
-    if(report.tongThu < 0) report.tongThu = 0;
-    
+    if (report.tongThu < 0) report.tongThu = 0;
+
     let totalCups = order.items.reduce((sum, item) => sum + item.qty, 0);
     report.tongLy -= totalCups;
-    if(report.tongLy < 0) report.tongLy = 0;
-    
+    if (report.tongLy < 0) report.tongLy = 0;
+
     order.items.forEach(item => {
         let key = `${item.item.name} - Size ${item.size}`;
         if (item.addonText) key += ` (+ ${item.addonText})`;
-        
+
         if (report.chiTietBan[key]) {
             report.chiTietBan[key] -= item.qty;
-            if(report.chiTietBan[key] <= 0) delete report.chiTietBan[key];
+            if (report.chiTietBan[key] <= 0) delete report.chiTietBan[key];
         }
     });
-    
+
     let currentActualStock = JSON.parse(localStorage.getItem('POS_KHO'));
     order.items.forEach(item => {
         const recipe = item.recipe;
         for (let nl in recipe) {
-            if(currentActualStock[nl]) {
+            if (currentActualStock[nl]) {
                 currentActualStock[nl].stock += (recipe[nl] * item.qty);
             }
         }
     });
     localStorage.setItem('POS_KHO', JSON.stringify(currentActualStock));
     khoHienTai = currentActualStock;
-    
+
     orders.splice(orderIndex, 1);
     report.orders = orders;
-    
+
     localStorage.setItem('POS_BAOCAO', JSON.stringify(report));
-    
+
     updateVirtualStock();
     renderInventory();
     alert('Hủy đơn thành công!');
@@ -673,7 +687,7 @@ document.addEventListener('visibilitychange', () => {
 });
 
 
-window.toggleSection = function(id, btn) {
+window.toggleSection = function (id, btn) {
     const el = document.getElementById(id);
     const icon = btn.querySelector('i');
     if (el.style.display === 'none') {
