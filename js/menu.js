@@ -229,7 +229,7 @@ const MENU = [
         price: { L: 28000 },
         hasAddonSua: false, hasAddonMatcha: false,
         congThuc: {
-            L: { nl_tralai: 150, nl_chunkyvai: 50, nl_syrupvai: 30, nl_duong: 20, nl_cunang: 30, nl_vaimieng: 1, nl_ly_l: 1 }
+            L: { nl_tralai: 150, nl_chunkyvai: 50, nl_syrupvai: 30, nl_duong: 20, nl_cunang: 30, nl_vaimieng: 1, nl_tac: 1, nl_ly_l: 1 }
         }
     }
 ];
