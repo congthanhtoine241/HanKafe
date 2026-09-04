@@ -6,8 +6,8 @@ const MENU = [
         price: { M: 15000, L: 20000 },
         hasAddonSua: false, hasAddonMatcha: false,
         congThuc: {
-            M: { nl_cf: 40, nl_duong: 20, nl_ly_m: 1 },
-            L: { nl_cf: 60, nl_duong: 30, nl_ly_l: 1 }
+            M: { nl_cf: 90, nl_duong: 30, nl_ly_m: 1 },
+            L: { nl_cf: 120, nl_duong: 40, nl_ly_l: 1 }
         }
     },
     {
@@ -15,8 +15,8 @@ const MENU = [
         price: { M: 18000, L: 23000 },
         hasAddonSua: false, hasAddonMatcha: false,
         congThuc: {
-            M: { nl_cf: 40, nl_suadac: 30, nl_ly_m: 1 },
-            L: { nl_cf: 60, nl_suadac: 40, nl_ly_l: 1 }
+            M: { nl_cf: 50, nl_suadac: 20, nl_ly_m: 1 },
+            L: { nl_cf: 90, nl_suadac: 35, nl_ly_l: 1 }
         }
     },
     {
@@ -24,8 +24,8 @@ const MENU = [
         price: { M: 18000, L: 23000 },
         hasAddonSua: true, hasAddonMatcha: false,
         congThuc: {
-            M: { nl_cf: 20, nl_suadac: 30, nl_sua_mlekovita: 50, nl_ly_m: 1 },
-            L: { nl_cf: 30, nl_suadac: 40, nl_sua_mlekovita: 80, nl_ly_l: 1 }
+            M: { nl_cf: 40, nl_suadac: 30, nl_sua_mlekovita: 50, nl_rich: 10, nl_ly_m: 1 },
+            L: { nl_cf: 60, nl_suadac: 40, nl_sua_mlekovita: 80, nl_rich: 20, nl_ly_l: 1 }
         }
     },
     {
@@ -33,8 +33,8 @@ const MENU = [
         price: { M: 20000, L: 25000 },
         hasAddonSua: true, hasAddonMatcha: false,
         congThuc: {
-            M: { nl_cf: 30, nl_sua_mlekovita: 80, nl_duong: 10, nl_ly_m: 1 },
-            L: { nl_cf: 40, nl_sua_mlekovita: 120, nl_duong: 15, nl_ly_l: 1 }
+            M: { nl_cf: 45, nl_sua_mlekovita: 100, nl_duong: 25, nl_rich: 10, nl_ly_m: 1 },
+            L: { nl_cf: 60, nl_sua_mlekovita: 150, nl_duong: 40, nl_rich: 15, nl_ly_l: 1 }
         }
     },
     {
@@ -42,8 +42,8 @@ const MENU = [
         price: { M: 22000, L: 27000 },
         hasAddonSua: false, hasAddonMatcha: false,
         congThuc: {
-            M: { nl_cf: 40, nl_suadac: 25, nl_kemmuoi: 30, nl_ly_m: 1 },
-            L: { nl_cf: 60, nl_suadac: 35, nl_kemmuoi: 40, nl_ly_l: 1 }
+            M: { nl_cf: 50, nl_suadac: 20, nl_kemmuoi: 45, nl_ly_m: 1 },
+            L: { nl_cf: 90, nl_suadac: 35, nl_kemmuoi: 60, nl_ly_l: 1 }
         }
     },
     {
@@ -51,8 +51,8 @@ const MENU = [
         price: { M: 22000, L: 27000 },
         hasAddonSua: false, hasAddonMatcha: false,
         congThuc: {
-            M: { nl_cf: 40, nl_suadac: 25, nl_kemmuoi: 40, nl_ly_m: 1 },
-            L: { nl_cf: 60, nl_suadac: 35, nl_kemmuoi: 50, nl_ly_l: 1 }
+            M: { nl_cf: 50, nl_suadac: 20, nl_kemdeo: 45, nl_ly_m: 1 },
+            L: { nl_cf: 90, nl_suadac: 35, nl_kemdeo: 60, nl_ly_l: 1 }
         }
     },
     {
@@ -60,8 +60,8 @@ const MENU = [
         price: { M: 25000, L: 30000 },
         hasAddonSua: false, hasAddonMatcha: false,
         congThuc: {
-            M: { nl_cf: 40, nl_sua_oatside: 60, nl_kemmuoi: 20, nl_ly_m: 1 },
-            L: { nl_cf: 60, nl_sua_oatside: 90, nl_kemmuoi: 30, nl_ly_l: 1 }
+            M: { nl_cf: 45, nl_sirohn: 20, nl_duong: 20, nl_rich: 20, nl_sua_oatside: 100, nl_thachcf: 30, nl_ly_m: 1 },
+            L: { nl_cf: 60, nl_sirohn: 30, nl_duong: 30, nl_rich: 20, nl_sua_oatside: 130, nl_thachcf: 30, nl_ly_l: 1 }
         }
     },
 
@@ -154,8 +154,8 @@ const MENU = [
         price: { M: 28000, L: 33000 },
         hasAddonSua: true, hasAddonMatcha: true,
         congThuc: {
-            M: { nl_matcha_dai: 6, nl_sua_mlekovita: 100, nl_ly_m: 1 },
-            L: { nl_matcha_dai: 8, nl_sua_mlekovita: 140, nl_ly_l: 1 }
+            M: { nl_matcha_dai: 5, nl_sua_mlekovita: 150, nl_duong: 20, nl_rich: 20, nl_ly_m: 1 },
+            L: { nl_matcha_dai: 7, nl_sua_mlekovita: 210, nl_duong: 30, nl_rich: 30, nl_ly_l: 1 }
         }
     },
     {
@@ -163,8 +163,8 @@ const MENU = [
         price: { M: 30000, L: 35000 },
         hasAddonSua: true, hasAddonMatcha: true,
         congThuc: {
-            M: { nl_matcha_dai: 5, nl_sua_mlekovita: 80, nl_kemmuoi: 30, nl_ly_m: 1 },
-            L: { nl_matcha_dai: 7, nl_sua_mlekovita: 120, nl_kemmuoi: 40, nl_ly_l: 1 }
+            M: { nl_matcha_dai: 3, nl_nuoc_dua: 140, nl_sua_mlekovita: 20, nl_rich: 30, nl_suadac: 30, nl_ly_m: 1 },
+            L: { nl_matcha_dai: 5, nl_nuoc_dua: 200, nl_sua_mlekovita: 30, nl_rich: 45, nl_suadac: 45, nl_ly_l: 1 }
         }
     },
 
@@ -174,8 +174,8 @@ const MENU = [
         price: { M: 20000, L: 25000 },
         hasAddonSua: true, hasAddonMatcha: false,
         congThuc: {
-            M: { nl_khoaimon: 15, nl_sua_mlekovita: 120, nl_duong: 15, nl_ly_m: 1 },
-            L: { nl_khoaimon: 20, nl_sua_mlekovita: 160, nl_duong: 20, nl_ly_l: 1 }
+            M: { nl_khoaimon: 15, nl_sua_mlekovita: 110, nl_suadac: 22, nl_nuoc_am: 35, nl_ly_m: 1 },
+            L: { nl_khoaimon: 20, nl_sua_mlekovita: 150, nl_suadac: 40, nl_nuoc_am: 50, nl_ly_l: 1 }
         }
     },
     {
@@ -183,18 +183,19 @@ const MENU = [
         price: { M: 25000, L: 30000 },
         hasAddonSua: true, hasAddonMatcha: false,
         congThuc: {
-            M: { nl_khoaimon: 15, nl_sua_mlekovita: 100, nl_kemmuoi: 30, nl_ly_m: 1 },
-            L: { nl_khoaimon: 20, nl_sua_mlekovita: 140, nl_kemmuoi: 40, nl_ly_l: 1 }
+            M: { nl_khoaimon: 15, nl_sua_mlekovita: 110, nl_suadac: 22, nl_nuoc_am: 35, nl_kemmuoi: 30, nl_ly_m: 1 },
+            L: { nl_khoaimon: 20, nl_sua_mlekovita: 150, nl_suadac: 40, nl_nuoc_am: 50, nl_kemmuoi: 40, nl_ly_l: 1 }
         }
     },
 
     // --- TRÀ SỮA (Chỉ size L) ---
     {
         id: 'ts_han', name: 'Trà sữa Han', category: 'Trà sữa', icon: '🧋',
-        price: { L: 25000 },
+        price: { M: 20000, L: 25000 },
         hasAddonSua: false, hasAddonMatcha: false,
         congThuc: {
-            L: { nl_trasua: 150, nl_tc_den: 50, nl_ly_l: 1 }
+            M: { nl_trasua: 200, nl_tc_den: 30, nl_ly_m: 1 },
+            L: { nl_trasua: 300, nl_tc_den: 60, nl_ly_l: 1 }
         }
     },
 
@@ -204,7 +205,7 @@ const MENU = [
         price: { L: 18000 },
         hasAddonSua: false, hasAddonMatcha: false,
         congThuc: {
-            L: { nl_tra: 150, nl_duong: 30, nl_ly_l: 1 }
+            L: { nl_traden: 210, nl_duong: 50, nl_tac: 2, nl_tc_den: 60, nl_ly_l: 1 }
         }
     },
     {
@@ -212,15 +213,15 @@ const MENU = [
         price: { L: 18000 },
         hasAddonSua: false, hasAddonMatcha: false,
         congThuc: {
-            L: { nl_tra: 150, nl_duong: 35, nl_ly_l: 1 }
+            L: { nl_thaixanh: 150, nl_duong: 35, nl_tac: 2, nl_tc_den: 30, nl_ly_l: 1 }
         }
     },
     {
-        id: 'tra_xao_cam', name: 'Trà Xào Cam Đã', category: 'Tea', icon: '🍊',
+        id: 'tra_xao_cam', name: 'Trà Sào Cam Đả', category: 'Tea', icon: '🍊',
         price: { L: 25000 },
         hasAddonSua: false, hasAddonMatcha: false,
         congThuc: {
-            L: { nl_tra: 150, nl_duong: 30, nl_ly_l: 1 }
+            L: { nl_tradao: 200, nl_nuoc_cam: 40, nl_syrupdao: 40, nl_duong: 20, nl_tac: 1, nl_daomieng: 3, nl_tc_3q: 30, nl_ly_l: 1 }
         }
     },
     {
@@ -228,7 +229,7 @@ const MENU = [
         price: { L: 28000 },
         hasAddonSua: false, hasAddonMatcha: false,
         congThuc: {
-            L: { nl_tra: 150, nl_duong: 30, nl_ly_l: 1 }
+            L: { nl_tralai: 150, nl_chunkyvai: 50, nl_syrupvai: 30, nl_duong: 20, nl_cunang: 30, nl_vaimieng: 1, nl_ly_l: 1 }
         }
     }
 ];

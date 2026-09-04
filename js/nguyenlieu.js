@@ -23,6 +23,7 @@ const KHO_MAC_DINH = [
     { id: 'nl_trasua', name: 'Cốt Trà Sữa', stock: 1000, unit: 'ml' },
     { id: 'nl_tralai', name: 'Cốt Trà Lài', stock: 1000, unit: 'ml' },
     { id: 'nl_tradao', name: 'Cốt Trà Đào', stock: 1000, unit: 'ml' },
+    { id: 'nl_thaixanh', name: 'Cốt Trà Xanh', stock: 1000, unit: 'ml' },
     { id: 'nl_traden', name: 'Cốt Trà Đen', stock: 1000, unit: 'ml' },
     { id: 'nl_dau', name: 'Mứt Dâu', stock: 1000, unit: 'ml' },
     { id: 'nl_syrupdao', name: 'Syrup Đào', stock: 1000, unit: 'ml' },
