@@ -60,8 +60,8 @@ const MENU = [
         price: { M: 25000, L: 30000 },
         hasAddonSua: false, hasAddonMatcha: false,
         congThuc: {
-            M: { nl_cf: 45, nl_sirohn: 20, nl_duong: 20, nl_rich: 20, nl_sua_oatside: 100, nl_thachcf: 30, nl_ly_m: 1 },
-            L: { nl_cf: 60, nl_sirohn: 30, nl_duong: 30, nl_rich: 20, nl_sua_oatside: 130, nl_thachcf: 30, nl_ly_l: 1 }
+            M: { nl_cf: 45, nl_sirohn: 20, nl_duong: 20, nl_rich: 20, nl_sua_mlekovita: 100, nl_thachcf: 30, nl_ly_m: 1 },
+            L: { nl_cf: 60, nl_sirohn: 30, nl_duong: 30, nl_rich: 20, nl_sua_mlekovita: 130, nl_thachcf: 30, nl_ly_l: 1 }
         }
     },
 
@@ -71,8 +71,8 @@ const MENU = [
         price: { M: 20000, L: 25000 },
         hasAddonSua: true, hasAddonMatcha: false,
         congThuc: {
-            M: { nl_cacao: 8, nl_sua_mlekovita: 100, nl_rich: 10, nl_nuoc_am: 40, nl_ly_m: 1 },
-            L: { nl_cacao: 10, nl_sua_mlekovita: 150, nl_rich: 15, nl_nuoc_am: 50, nl_ly_l: 1 }
+            M: { nl_cacao: 8, nl_sua_mlekovita: 100, nl_suadac: 30, nl_rich: 10, nl_nuoc_am: 40, nl_ly_m: 1 },
+            L: { nl_cacao: 10, nl_sua_mlekovita: 150, nl_suadac: 50, nl_rich: 15, nl_nuoc_am: 50, nl_ly_l: 1 }
         }
     },
     {
@@ -89,8 +89,8 @@ const MENU = [
         price: { M: 25000, L: 30000 },
         hasAddonSua: true, hasAddonMatcha: false,
         congThuc: {
-            M: { nl_cacao: 8, nl_khoaimon: 15, nl_sua_mlekovita: 40, nl_suadac: 20, nl_nuoc_am: 80, nl_ly_m: 1 },
-            L: { nl_cacao: 10, nl_khoaimon: 20, nl_sua_mlekovita: 100, nl_suadac: 30, nl_nuoc_am: 100, nl_ly_l: 1 }
+            M: { nl_cacao: 8, nl_nuoc_am: 70, nl_khoaimon: 15, nl_sua_mlekovita: 40, nl_suadac: 20, nl_ly_m: 1 },
+            L: { nl_cacao: 10, nl_nuoc_am: 100, nl_khoaimon: 20, nl_sua_mlekovita: 100, nl_suadac: 30, nl_ly_l: 1 }
         }
     },
     {
@@ -98,8 +98,8 @@ const MENU = [
         price: { M: 25000, L: 30000 },
         hasAddonSua: true, hasAddonMatcha: false,
         congThuc: {
-            M: { nl_cacao: 8, nl_sua_mlekovita: 100, nl_rich: 10, nl_nuoc_am: 40, nl_kemmuoi: 30, nl_ly_m: 1 },
-            L: { nl_cacao: 10, nl_sua_mlekovita: 150, nl_rich: 15, nl_nuoc_am: 50, nl_kemmuoi: 40, nl_ly_l: 1 }
+            M: { nl_cacao: 8, nl_sua_mlekovita: 100, nl_suadac: 30, nl_rich: 10, nl_nuoc_am: 40, nl_kemmuoi: 30, nl_ly_m: 1 },
+            L: { nl_cacao: 10, nl_sua_mlekovita: 150, nl_suadac: 50, nl_rich: 15, nl_nuoc_am: 50, nl_kemmuoi: 40, nl_ly_l: 1 }
         }
     },
 
@@ -127,8 +127,8 @@ const MENU = [
         price: { M: 25000, L: 30000 },
         hasAddonSua: true, hasAddonMatcha: true,
         congThuc: {
-            M: { nl_matcha_dai: 3, nl_khoaimon: 15, nl_sua_mlekovita: 40, nl_suadac: 20, nl_nuoc_am: 70, nl_ly_m: 1 },
-            L: { nl_matcha_dai: 5, nl_khoaimon: 20, nl_sua_mlekovita: 100, nl_suadac: 30, nl_nuoc_am: 100, nl_ly_l: 1 }
+            M: { nl_matcha_dai: 3, nl_nuoc_am: 70, nl_khoaimon: 15, nl_sua_mlekovita: 40, nl_suadac: 20, nl_ly_m: 1 },
+            L: { nl_matcha_dai: 5, nl_nuoc_am: 100, nl_khoaimon: 20, nl_sua_mlekovita: 100, nl_suadac: 30, nl_ly_l: 1 }
         }
     },
     {
@@ -136,8 +136,8 @@ const MENU = [
         price: { M: 28000, L: 33000 },
         hasAddonSua: true, hasAddonMatcha: true,
         congThuc: {
-            M: { nl_matcha_dai: 4, nl_nuoc_am: 50, nl_sua_mlekovita: 100, nl_rich: 10, nl_suadac: 30, nl_kemmuoi: 30, nl_ly_m: 1 },
-            L: { nl_matcha_dai: 6, nl_nuoc_am: 70, nl_sua_mlekovita: 150, nl_rich: 15, nl_suadac: 40, nl_kemmuoi: 40, nl_ly_l: 1 }
+            M: { nl_matcha_dai: 4, nl_nuoc_am: 50, nl_sua_mlekovita: 100, nl_oreo: 3, nl_rich: 10, nl_suadac: 30, nl_kemmuoi: 30, nl_ly_m: 1 },
+            L: { nl_matcha_dai: 6, nl_nuoc_am: 70, nl_sua_mlekovita: 150, nl_oreo: 3, nl_rich: 15, nl_suadac: 40, nl_kemmuoi: 40, nl_ly_l: 1 }
         }
     },
     {

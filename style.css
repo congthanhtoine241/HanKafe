@@ -288,6 +288,27 @@ body {
     margin-bottom: 0.5rem;
 }
 
+.cart-item-note-container {
+    margin-bottom: 0.5rem;
+}
+
+.cart-item-note {
+    width: 100%;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.85rem;
+    border: 1px dashed var(--border-color);
+    border-radius: 0.3rem;
+    background: white;
+    color: var(--text-main);
+    transition: border-color 0.2s;
+}
+
+.cart-item-note:focus {
+    outline: none;
+    border-color: var(--primary);
+    border-style: solid;
+}
+
 .cart-item-controls {
     display: flex;
     justify-content: space-between;

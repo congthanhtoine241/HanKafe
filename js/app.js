@@ -300,7 +300,8 @@ function addToCart(item, size, addonsData) {
             price,
             qty: 1,
             recipe: realRecipe,
-            addonText: addonText.join(', ')
+            addonText: addonText.join(', '),
+            note: ''
         });
     }
 
@@ -324,6 +325,10 @@ function updateVirtualStock() {
     });
 
     renderMenu(); // Update menu buttons
+}
+
+window.updateNote = function (index, value) {
+    gioHang[index].note = value;
 }
 
 window.changeQty = function (index, delta) {
@@ -373,6 +378,9 @@ function renderCart() {
                 <span class="item-price">${(cItem.price * cItem.qty).toLocaleString('vi-VN')}đ</span>
             </div>
             ${cItem.addonText ? `<div class="cart-item-addons">+ ${cItem.addonText}</div>` : ''}
+            <div class="cart-item-note-container">
+                <input type="text" class="cart-item-note" placeholder="Ghi chú (ít đá, nhiều ngọt...)" value="${cItem.note || ''}" onchange="updateNote(${index}, this.value)">
+            </div>
             <div class="cart-item-controls">
                 <div class="qty-control">
                     <button class="qty-btn" onclick="changeQty(${index}, -1)">-</button>
@@ -459,6 +467,9 @@ document.getElementById('checkout-btn').onclick = () => {
         if (item.addonText) {
             key += ` (+ ${item.addonText})`;
         }
+        if (item.note && item.note.trim() !== '') {
+            key += ` (Ghi chú: ${item.note.trim()})`;
+        }
         if (!report.chiTietBan[key]) {
             report.chiTietBan[key] = 0;
         }
@@ -542,7 +553,11 @@ function renderInventory() {
             recentOrdersList.innerHTML = '<div style="padding: 10px; color: #888;">Chưa có đơn hàng nào.</div>';
         } else {
             orders.forEach(order => {
-                const itemSummary = order.items.map(i => `${i.qty}x ${i.item.name}`).join(', ');
+                const itemSummary = order.items.map(i => {
+                    let s = `${i.qty}x ${i.item.name}`;
+                    if (i.note && i.note.trim() !== '') s += ` (Ghi chú: ${i.note.trim()})`;
+                    return s;
+                }).join(', ');
                 recentOrdersList.innerHTML += `
                     <div class="order-history-item">
                         <div class="order-info">
@@ -634,6 +649,7 @@ window.voidOrder = function (orderId) {
     order.items.forEach(item => {
         let key = `${item.item.name} - Size ${item.size}`;
         if (item.addonText) key += ` (+ ${item.addonText})`;
+        if (item.note && item.note.trim() !== '') key += ` (Ghi chú: ${item.note.trim()})`;
 
         if (report.chiTietBan[key]) {
             report.chiTietBan[key] -= item.qty;
