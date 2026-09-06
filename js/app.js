@@ -484,7 +484,7 @@ document.getElementById('checkout-btn').onclick = () => {
     };
     if (!report.orders) report.orders = [];
     report.orders.unshift(orderObj);
-    if (report.orders.length > 30) report.orders.pop();
+    if (report.orders.length > 50) report.orders.pop();
 
     localStorage.setItem('POS_BAOCAO', JSON.stringify(report));
 
@@ -553,21 +553,34 @@ function renderInventory() {
             recentOrdersList.innerHTML = '<div style="padding: 10px; color: #888;">Chưa có đơn hàng nào.</div>';
         } else {
             orders.forEach(order => {
-                const itemSummary = order.items.map(i => {
-                    let s = `${i.qty}x ${i.item.name}`;
-                    if (i.note && i.note.trim() !== '') s += ` (Ghi chú: ${i.note.trim()})`;
-                    return s;
-                }).join(', ');
-                recentOrdersList.innerHTML += `
-                    <div class="order-history-item">
-                        <div class="order-info">
-                            <span class="order-time"><i class="far fa-clock"></i> ${order.time}</span>
-                            <span style="font-size: 0.9rem;">${itemSummary}</span>
-                            <span class="order-total">${order.total.toLocaleString('vi-VN')}đ</span>
+                if (order.isExpense) {
+                    recentOrdersList.innerHTML += `
+                        <div class="order-history-item" style="border-left: 4px solid var(--danger);">
+                            <div class="order-info">
+                                <span class="order-time"><i class="far fa-clock"></i> ${order.time}</span>
+                                <span style="font-size: 0.9rem; font-weight: bold; color: var(--danger);">[CHI TIỀN] ${order.desc}</span>
+                                <span class="order-total" style="color: var(--danger);">- ${order.total.toLocaleString('vi-VN')}đ</span>
+                            </div>
+                            <button class="btn-void" onclick="voidOrder(${order.id})">Hủy</button>
                         </div>
-                        <button class="btn-void" onclick="voidOrder(${order.id})">Hủy</button>
-                    </div>
-                `;
+                    `;
+                } else {
+                    const itemSummary = order.items.map(i => {
+                        let s = `${i.qty}x ${i.item.name}`;
+                        if (i.note && i.note.trim() !== '') s += ` (Ghi chú: ${i.note.trim()})`;
+                        return s;
+                    }).join(', ');
+                    recentOrdersList.innerHTML += `
+                        <div class="order-history-item">
+                            <div class="order-info">
+                                <span class="order-time"><i class="far fa-clock"></i> ${order.time}</span>
+                                <span style="font-size: 0.9rem;">${itemSummary}</span>
+                                <span class="order-total">${order.total.toLocaleString('vi-VN')}đ</span>
+                            </div>
+                            <button class="btn-void" onclick="voidOrder(${order.id})">Hủy</button>
+                        </div>
+                    `;
+                }
             });
         }
     }
@@ -588,6 +601,46 @@ function renderInventory() {
         `;
     }
 }
+
+document.getElementById('add-expense-btn').onclick = () => {
+    const descInput = document.getElementById('expense-desc');
+    const amountInput = document.getElementById('expense-amount');
+    
+    const desc = descInput.value.trim();
+    const amount = parseInt(amountInput.value);
+    
+    if (!desc || isNaN(amount) || amount <= 0) {
+        alert('Vui lòng nhập nội dung và số tiền hợp lệ!');
+        return;
+    }
+    
+    const report = JSON.parse(localStorage.getItem('POS_BAOCAO'));
+    
+    // Trừ doanh thu (Cho phép âm)
+    report.tongThu -= amount;
+    
+    // Tạo bill chi tiền
+    const orderObj = {
+        id: Date.now(),
+        time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+        total: amount,
+        items: [],
+        isExpense: true,
+        desc: desc
+    };
+    
+    if (!report.orders) report.orders = [];
+    report.orders.unshift(orderObj);
+    if (report.orders.length > 50) report.orders.pop();
+    
+    localStorage.setItem('POS_BAOCAO', JSON.stringify(report));
+    
+    descInput.value = '';
+    amountInput.value = '';
+    
+    renderInventory();
+    alert('Đã ghi nhận khoản chi!');
+};
 
 document.getElementById('save-inventory-btn').onclick = () => {
     for (let key in khoHienTai) {
@@ -630,44 +683,49 @@ renderCart();
 
 // --- VOID ORDER ---
 window.voidOrder = function (orderId) {
-    if (!confirm('Bạn có chắc chắn muốn hủy đơn này và hoàn nguyên liệu?')) return;
+    if (!confirm('Bạn có chắc chắn muốn hủy giao dịch này?')) return;
 
     let report = JSON.parse(localStorage.getItem('POS_BAOCAO'));
     let orders = report.orders || [];
     const orderIndex = orders.findIndex(o => o.id === orderId);
-    if (orderIndex === -1) return alert('Không tìm thấy đơn hàng!');
+    if (orderIndex === -1) return alert('Không tìm thấy giao dịch!');
 
     const order = orders[orderIndex];
 
-    report.tongThu -= order.total;
-    if (report.tongThu < 0) report.tongThu = 0;
+    if (order.isExpense) {
+        // Hủy chi tiền -> cộng lại doanh thu
+        report.tongThu += order.total;
+    } else {
+        // Hủy đơn hàng -> trừ doanh thu
+        report.tongThu -= order.total;
 
-    let totalCups = order.items.reduce((sum, item) => sum + item.qty, 0);
-    report.tongLy -= totalCups;
-    if (report.tongLy < 0) report.tongLy = 0;
+        let totalCups = order.items.reduce((sum, item) => sum + item.qty, 0);
+        report.tongLy -= totalCups;
+        if (report.tongLy < 0) report.tongLy = 0;
 
-    order.items.forEach(item => {
-        let key = `${item.item.name} - Size ${item.size}`;
-        if (item.addonText) key += ` (+ ${item.addonText})`;
-        if (item.note && item.note.trim() !== '') key += ` (Ghi chú: ${item.note.trim()})`;
+        order.items.forEach(item => {
+            let key = `${item.item.name} - Size ${item.size}`;
+            if (item.addonText) key += ` (+ ${item.addonText})`;
+            if (item.note && item.note.trim() !== '') key += ` (Ghi chú: ${item.note.trim()})`;
 
-        if (report.chiTietBan[key]) {
-            report.chiTietBan[key] -= item.qty;
-            if (report.chiTietBan[key] <= 0) delete report.chiTietBan[key];
-        }
-    });
-
-    let currentActualStock = JSON.parse(localStorage.getItem('POS_KHO'));
-    order.items.forEach(item => {
-        const recipe = item.recipe;
-        for (let nl in recipe) {
-            if (currentActualStock[nl]) {
-                currentActualStock[nl].stock += (recipe[nl] * item.qty);
+            if (report.chiTietBan[key]) {
+                report.chiTietBan[key] -= item.qty;
+                if (report.chiTietBan[key] <= 0) delete report.chiTietBan[key];
             }
-        }
-    });
-    localStorage.setItem('POS_KHO', JSON.stringify(currentActualStock));
-    khoHienTai = currentActualStock;
+        });
+
+        let currentActualStock = JSON.parse(localStorage.getItem('POS_KHO'));
+        order.items.forEach(item => {
+            const recipe = item.recipe;
+            for (let nl in recipe) {
+                if (currentActualStock[nl]) {
+                    currentActualStock[nl].stock += (recipe[nl] * item.qty);
+                }
+            }
+        });
+        localStorage.setItem('POS_KHO', JSON.stringify(currentActualStock));
+        khoHienTai = currentActualStock;
+    }
 
     orders.splice(orderIndex, 1);
     report.orders = orders;
@@ -676,7 +734,7 @@ window.voidOrder = function (orderId) {
 
     updateVirtualStock();
     renderInventory();
-    alert('Hủy đơn thành công!');
+    alert('Hủy giao dịch thành công!');
 }
 
 // --- WAKE LOCK API ---

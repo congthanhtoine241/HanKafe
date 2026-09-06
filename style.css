@@ -677,18 +677,22 @@ body {
     position: fixed;
     bottom: 90px;
     left: 50%;
-    transform: translateX(-50%) translateY(100px);
+    transform: translateX(-50%) translateY(20px);
+    opacity: 0;
+    visibility: hidden;
     background: rgba(0,0,0,0.8);
     color: white;
     padding: 0.8rem 1.5rem;
     border-radius: 2rem;
     font-size: 0.9rem;
     z-index: 300;
-    transition: transform 0.3s;
+    transition: all 0.3s ease;
     pointer-events: none;
 }
 .toast.show {
     transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    visibility: visible;
 }
 
 
