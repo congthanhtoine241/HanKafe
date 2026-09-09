@@ -24,8 +24,8 @@ const MENU = [
         price: { M: 18000, L: 23000 },
         hasAddonSua: true, hasAddonMatcha: false,
         congThuc: {
-            M: { nl_cf: 40, nl_cf_giao: 10, nl_suadac: 30, nl_sua_mlekovita: 50, nl_rich: 10, nl_ly_m: 1 },
-            L: { nl_cf: 60, nl_cf_giao: 10, nl_suadac: 40, nl_sua_mlekovita: 80, nl_rich: 20, nl_ly_l: 1 }
+            M: { nl_cf: 10, nl_cf_giao: 40, nl_suadac: 30, nl_sua_mlekovita: 50, nl_rich: 10, nl_ly_m: 1 },
+            L: { nl_cf: 10, nl_cf_giao: 60, nl_suadac: 40, nl_sua_mlekovita: 80, nl_rich: 20, nl_ly_l: 1 }
         }
     },
     {
@@ -33,8 +33,8 @@ const MENU = [
         price: { M: 20000, L: 25000 },
         hasAddonSua: true, hasAddonMatcha: false,
         congThuc: {
-            M: { nl_cf: 45, nl_cf_giao: 10, nl_sua_mlekovita: 100, nl_duong: 25, nl_rich: 10, nl_ly_m: 1 },
-            L: { nl_cf: 60, nl_cf_giao: 10, nl_sua_mlekovita: 150, nl_duong: 40, nl_rich: 15, nl_ly_l: 1 }
+            M: { nl_cf: 10, nl_cf_giao: 45, nl_sua_mlekovita: 100, nl_duong: 25, nl_rich: 10, nl_ly_m: 1 },
+            L: { nl_cf: 10, nl_cf_giao: 60, nl_sua_mlekovita: 150, nl_duong: 40, nl_rich: 15, nl_ly_l: 1 }
         }
     },
     {
