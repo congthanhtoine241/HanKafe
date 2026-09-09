@@ -128,7 +128,7 @@ let tempSelectedItem = null;
 window.handleMenuClick = function (itemId, size) {
     const item = MENU.find(m => m.id === itemId);
 
-    if (item.hasAddonSua || item.hasAddonMatcha || ['Cacao', 'Matcha', 'Khoai môn'].includes(item.category)) {
+    if (item.hasAddonSua || item.hasAddonMatcha || ['Cacao', 'Matcha', 'Khoai môn', 'Trà sữa', 'Tea'].includes(item.category)) {
         // Open Modal
         tempSelectedItem = { item, size };
         openAddonModal(item, size);
@@ -258,7 +258,7 @@ function calculateRealRecipe(item, size, addonsData) {
     // Add Toppings
     if (addonsData.toppings && addonsData.toppings.length > 0) {
         addonsData.toppings.forEach(t => {
-            recipe[t.id] = t.qty;
+            recipe[t.id] = (recipe[t.id] || 0) + t.qty;
         });
     }
     return recipe;

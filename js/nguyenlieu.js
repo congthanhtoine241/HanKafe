@@ -1,6 +1,7 @@
 // Khai báo nguyên liệu gốc
 const KHO_MAC_DINH = [
     { id: 'nl_cf', name: 'Cốt Cà phê', stock: 20000, unit: 'ml' },
+    { id: 'nl_cf_giao', name: 'Cốt Cà phê Dão', stock: 20000, unit: 'ml' },
     { id: 'nl_matcha_dai', name: 'Matcha Đài', stock: 5000, unit: 'g' },
     { id: 'nl_matcha_mk4', name: 'Matcha MK4', stock: 5000, unit: 'g' },
     { id: 'nl_cacao', name: 'Bột Cacao', stock: 5000, unit: 'g' },
