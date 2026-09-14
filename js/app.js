@@ -37,6 +37,13 @@ initData();
 // --- STATE ---
 let khoHienTai = JSON.parse(localStorage.getItem('POS_KHO'));
 let khoAo = JSON.parse(JSON.stringify(khoHienTai)); // Deep copy for virtual stock
+
+let currentMenu = JSON.parse(localStorage.getItem('POS_MENU'));
+if (!currentMenu) {
+    currentMenu = JSON.parse(JSON.stringify(MENU));
+    localStorage.setItem('POS_MENU', JSON.stringify(currentMenu));
+}
+
 let gioHang = []; // Array of cart items
 let currentCategory = 'Cà phê';
 
@@ -73,7 +80,7 @@ function calcMaxCups(recipeObj) {
 
 // --- RENDER MENU ---
 function renderCategories() {
-    const cats = [...new Set(MENU.map(m => m.category))];
+    const cats = [...new Set(currentMenu.map(m => m.category))];
     categoriesContainer.innerHTML = '';
     cats.forEach(cat => {
         const btn = document.createElement('button');
@@ -91,7 +98,7 @@ function renderCategories() {
 
 function renderMenu() {
     menuGrid.innerHTML = '';
-    const items = MENU.filter(m => m.category === currentCategory);
+    const items = currentMenu.filter(m => m.category === currentCategory);
 
     items.forEach(item => {
         // Calculate max cups for M and L
@@ -126,7 +133,7 @@ function renderMenu() {
 let tempSelectedItem = null;
 
 window.handleMenuClick = function (itemId, size) {
-    const item = MENU.find(m => m.id === itemId);
+    const item = currentMenu.find(m => m.id === itemId);
 
     if (item.hasAddonSua || item.hasAddonMatcha || ['Cacao', 'Matcha', 'Khoai môn', 'Trà sữa', 'Tea'].includes(item.category)) {
         // Open Modal
@@ -772,4 +779,160 @@ window.toggleSection = function (id, btn) {
         icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
     }
 }
+
+// --- RECIPE EDITOR LOGIC ---
+const recipeSelect = document.getElementById('recipe-select');
+const recipeEditorContainer = document.getElementById('recipe-editor-container');
+const recipeSizeTabs = document.getElementById('recipe-size-tabs');
+const recipeIngredientsList = document.getElementById('recipe-ingredients-list');
+const currentRecipeSizeSpan = document.getElementById('current-recipe-size');
+const addIngredientSelect = document.getElementById('add-ingredient-select');
+
+let selectedRecipeId = null;
+let editingSize = null;
+
+function renderRecipeSelect() {
+    recipeSelect.innerHTML = '<option value="">-- Chọn món --</option>';
+    currentMenu.forEach(item => {
+        recipeSelect.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+    });
+}
+
+function renderAddIngredientSelect() {
+    addIngredientSelect.innerHTML = '<option value="">-- Chọn nguyên liệu --</option>';
+    KHO_MAC_DINH.forEach(nl => {
+        addIngredientSelect.innerHTML += `<option value="${nl.id}">${nl.name} (${nl.unit})</option>`;
+    });
+}
+
+recipeSelect.addEventListener('change', (e) => {
+    selectedRecipeId = e.target.value;
+    if (!selectedRecipeId) {
+        recipeEditorContainer.style.display = 'none';
+        return;
+    }
+    
+    const item = currentMenu.find(m => m.id === selectedRecipeId);
+    recipeEditorContainer.style.display = 'block';
+    
+    // Setup size tabs
+    recipeSizeTabs.innerHTML = '';
+    const sizes = Object.keys(item.congThuc);
+    if (sizes.length === 0) {
+        recipeEditorContainer.style.display = 'none';
+        return;
+    }
+    
+    sizes.forEach(size => {
+        const btn = document.createElement('button');
+        btn.className = `btn-size`;
+        btn.textContent = `Size ${size}`;
+        btn.onclick = () => loadRecipeSize(size);
+        recipeSizeTabs.appendChild(btn);
+    });
+    
+    loadRecipeSize(sizes[0]);
+});
+
+function loadRecipeSize(size) {
+    editingSize = size;
+    currentRecipeSizeSpan.textContent = size;
+    
+    // Update active tab style
+    Array.from(recipeSizeTabs.children).forEach(btn => {
+        if (btn.textContent === `Size ${size}`) {
+            btn.classList.add('active');
+            btn.style.boxShadow = 'var(--shadow)';
+        } else {
+            btn.classList.remove('active');
+            btn.style.boxShadow = 'none';
+        }
+    });
+    
+    renderRecipeIngredients();
+}
+
+function renderRecipeIngredients() {
+    recipeIngredientsList.innerHTML = '';
+    const item = currentMenu.find(m => m.id === selectedRecipeId);
+    const recipe = item.congThuc[editingSize];
+    
+    for (let nl_id in recipe) {
+        const qty = recipe[nl_id];
+        const nlName = getIngredientName(nl_id);
+        const nlUnit = getIngredientUnit(nl_id);
+        
+        recipeIngredientsList.innerHTML += `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-main);">
+                <div style="flex: 1; font-weight: 500;">${nlName}</div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="number" value="${qty}" class="recipe-qty-input" data-nl="${nl_id}" style="width: 70px; padding: 5px; text-align: right; border-radius: 5px; border: 1px solid var(--border-color);">
+                    <span style="width: 40px; font-size: 0.9rem; color: var(--text-muted);">${nlUnit}</span>
+                    <button onclick="removeRecipeIngredient('${nl_id}')" style="background: var(--danger); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+        `;
+    }
+}
+
+window.removeRecipeIngredient = function(nl_id) {
+    const item = currentMenu.find(m => m.id === selectedRecipeId);
+    delete item.congThuc[editingSize][nl_id];
+    renderRecipeIngredients();
+};
+
+document.getElementById('add-ingredient-btn').onclick = () => {
+    const nl_id = addIngredientSelect.value;
+    const qty = parseFloat(document.getElementById('add-ingredient-qty').value);
+    
+    if (!nl_id || isNaN(qty) || qty <= 0) {
+        alert('Vui lòng chọn nguyên liệu và nhập số lượng hợp lệ!');
+        return;
+    }
+    
+    const item = currentMenu.find(m => m.id === selectedRecipeId);
+    item.congThuc[editingSize][nl_id] = qty;
+    
+    document.getElementById('add-ingredient-qty').value = '';
+    addIngredientSelect.value = '';
+    
+    renderRecipeIngredients();
+};
+
+document.getElementById('save-recipe-btn').onclick = () => {
+    if (!selectedRecipeId || !editingSize) return;
+    
+    const item = currentMenu.find(m => m.id === selectedRecipeId);
+    const inputs = document.querySelectorAll('.recipe-qty-input');
+    
+    inputs.forEach(input => {
+        const nl_id = input.dataset.nl;
+        const qty = parseFloat(input.value);
+        if (!isNaN(qty) && qty > 0) {
+            item.congThuc[editingSize][nl_id] = qty;
+        }
+    });
+    
+    localStorage.setItem('POS_MENU', JSON.stringify(currentMenu));
+    updateVirtualStock(); // Cập nhật lại kho ảo và nút bấm
+    alert('Đã lưu công thức thành công!');
+};
+
+document.getElementById('reset-recipes-btn').onclick = () => {
+    if (confirm('Bạn có chắc chắn muốn khôi phục TẤT CẢ công thức về mặc định?')) {
+        currentMenu = JSON.parse(JSON.stringify(MENU));
+        localStorage.setItem('POS_MENU', JSON.stringify(currentMenu));
+        renderRecipeSelect();
+        if (selectedRecipeId) {
+            recipeSelect.value = selectedRecipeId;
+            recipeSelect.dispatchEvent(new Event('change'));
+        }
+        updateVirtualStock();
+        alert('Đã khôi phục công thức gốc!');
+    }
+};
+
+// Khởi tạo options
+renderRecipeSelect();
+renderAddIngredientSelect();
 

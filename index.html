@@ -112,6 +112,39 @@
             <button id="close-shift-btn" class="btn-danger full-width mt-20">Chốt Ca & Reset Báo Cáo</button>
         </main>
 
+        <!-- TAB 3: CÔNG THỨC -->
+        <main id="tab-recipes" class="tab-content">
+            <div class="section-header">
+                <h2>Chỉnh Sửa Công Thức</h2>
+            </div>
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <select id="recipe-select" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 1rem; background: white;">
+                    <option value="">-- Chọn món --</option>
+                </select>
+                <button id="reset-recipes-btn" style="background-color: #6c757d; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer;">Khôi phục gốc</button>
+            </div>
+
+            <div id="recipe-editor-container" style="display: none; background: #fff; padding: 15px; border-radius: 12px; box-shadow: var(--shadow-sm);">
+                <div id="recipe-size-tabs" style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <!-- Size buttons will be injected here -->
+                </div>
+                
+                <h4 style="margin-bottom: 10px; color: var(--text-main);">Công thức Size <span id="current-recipe-size"></span></h4>
+                <div id="recipe-ingredients-list" style="margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px;">
+                    <!-- List of ingredients -->
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <select id="add-ingredient-select" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.9rem; background: white;">
+                        <option value="">-- Chọn nguyên liệu --</option>
+                    </select>
+                    <input type="number" id="add-ingredient-qty" placeholder="SL" style="width: 70px; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.9rem;">
+                    <button id="add-ingredient-btn" class="btn-primary" style="padding: 10px; font-size: 0.9rem;">Thêm</button>
+                </div>
+                
+                <button id="save-recipe-btn" class="btn-primary full-width">Lưu Công Thức Này</button>
+            </div>
+        </main>
         <!-- BOTTOM NAVIGATION -->
         <nav class="bottom-nav">
             <button class="nav-btn active" data-target="tab-sales">
@@ -121,6 +154,10 @@
             <button class="nav-btn" data-target="tab-inventory">
                 <i class="fas fa-box"></i>
                 <span>Kho & Doanh Thu</span>
+            </button>
+            <button class="nav-btn" data-target="tab-recipes">
+                <i class="fas fa-book-open"></i>
+                <span>Công Thức</span>
             </button>
         </nav>
 
