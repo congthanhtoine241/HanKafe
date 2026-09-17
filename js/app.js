@@ -1,9 +1,8 @@
-// --- QUẢN LÝ DỮ LIỆU LOCALSTORAGE ---
+// QUẢN LÝ DỮ LIỆU LOCALSTORAGE
 function initData() {
     let currentKho = JSON.parse(localStorage.getItem('POS_KHO')) || {};
     let isUpdated = false;
 
-    // Init or merge from nguyenlieu.js
     KHO_MAC_DINH.forEach(item => {
         if (!currentKho[item.id]) {
             currentKho[item.id] = { ...item };
@@ -24,19 +23,134 @@ function initData() {
 
     let baocao = JSON.parse(localStorage.getItem('POS_BAOCAO'));
     if (!baocao) {
-        baocao = { tongThu: 0, tongLy: 0, chiTietBan: {}, orders: [] };
+        baocao = { tongThu: 0, tongThuTienMat: 0, tongThuChuyenKhoan: 0, tongLy: 0, tongChi: 0, chiTietBan: {}, orders: [] };
         localStorage.setItem('POS_BAOCAO', JSON.stringify(baocao));
     } else {
         if (!baocao.chiTietBan) baocao.chiTietBan = {};
         if (!baocao.orders) baocao.orders = [];
+        if (typeof baocao.tongThuTienMat === 'undefined') baocao.tongThuTienMat = 0;
+        if (typeof baocao.tongThuChuyenKhoan === 'undefined') baocao.tongThuChuyenKhoan = 0;
+        if (typeof baocao.tongChi === 'undefined') {
+            let sumChi = 0;
+            baocao.orders.forEach(o => {
+                if (o.isExpense) sumChi += o.total;
+            });
+            baocao.tongChi = sumChi;
+        }
+
         localStorage.setItem('POS_BAOCAO', JSON.stringify(baocao));
     }
 }
 initData();
 
-// --- STATE ---
+// QUẢN LÝ LỊCH SỬ DOANH THU
+class RevenueHistory {
+    constructor() {
+        this.storageKey = 'POS_REVENUE_HISTORY';
+        this.init();
+        this.checkMonthlyReset();
+    }
+
+    getPeriod(dateObj) {
+        let y = dateObj.getFullYear();
+        let m = dateObj.getMonth();
+        // Nếu là ngày 1, nó vẫn thuộc chu kỳ của tháng trước
+        if (dateObj.getDate() < 2) {
+            m -= 1;
+            if (m < 0) {
+                m = 11;
+                y -= 1;
+            }
+        }
+        return { y, m };
+    }
+
+    init() {
+        const data = JSON.parse(localStorage.getItem(this.storageKey));
+        if (!data) {
+            const currentPeriod = this.getPeriod(new Date());
+            this.data = {
+                lastResetMonth: currentPeriod.m,
+                lastResetYear: currentPeriod.y,
+                dailyRecords: {} // key: 'YYYY-MM-DD', value: { tongThu, tongThuTienMat, tongThuChuyenKhoan, tongLy }
+            };
+            this.save();
+        } else {
+            this.data = data;
+            if (this.data.lastResetYear === undefined) {
+                this.data.lastResetYear = new Date().getFullYear();
+            }
+        }
+    }
+
+    save() {
+        localStorage.setItem(this.storageKey, JSON.stringify(this.data));
+    }
+
+    checkMonthlyReset() {
+        const now = new Date();
+        const currentPeriod = this.getPeriod(now);
+
+        // Nếu chu kỳ hiện tại khác với chu kỳ đã lưu
+        if (this.data.lastResetYear !== currentPeriod.y || this.data.lastResetMonth !== currentPeriod.m) {
+            this.data.dailyRecords = {}; // Xoá dữ liệu cũ
+            this.data.lastResetMonth = currentPeriod.m;
+            this.data.lastResetYear = currentPeriod.y;
+            this.save();
+            console.log('Đã reset dữ liệu lịch sử doanh thu cho kỳ mới bắt đầu từ ngày 2!');
+        }
+    }
+
+    addShiftData(reportData) {
+        const todayStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
+        if (!this.data.dailyRecords[todayStr]) {
+            this.data.dailyRecords[todayStr] = {
+                tongThu: 0,
+                tongThuTienMat: 0,
+                tongThuChuyenKhoan: 0,
+                tongLy: 0,
+                tongChi: 0,
+                chotCaCount: 0
+            };
+        }
+
+        let record = this.data.dailyRecords[todayStr];
+        record.tongThu += (reportData.tongThu || 0);
+        record.tongThuTienMat += (reportData.tongThuTienMat || 0);
+        record.tongThuChuyenKhoan += (reportData.tongThuChuyenKhoan || 0);
+        record.tongLy += (reportData.tongLy || 0);
+        record.tongChi += (reportData.tongChi || 0);
+        record.chotCaCount += 1;
+
+        this.save();
+    }
+
+    getMonthlyTotal(currentReport) {
+        let sum = {
+            tongThu: (currentReport ? currentReport.tongThu : 0),
+            tongThuTienMat: (currentReport ? currentReport.tongThuTienMat : 0),
+            tongThuChuyenKhoan: (currentReport ? currentReport.tongThuChuyenKhoan : 0),
+            tongLy: (currentReport ? currentReport.tongLy : 0),
+            tongChi: (currentReport ? currentReport.tongChi : 0)
+        };
+
+        for (let date in this.data.dailyRecords) {
+            let record = this.data.dailyRecords[date];
+            sum.tongThu += record.tongThu;
+            sum.tongThuTienMat += record.tongThuTienMat;
+            sum.tongThuChuyenKhoan += record.tongThuChuyenKhoan;
+            sum.tongLy += record.tongLy;
+            sum.tongChi += (record.tongChi || 0);
+        }
+        return sum;
+    }
+}
+const revenueHistory = new RevenueHistory();
+
+// STATE
 let khoHienTai = JSON.parse(localStorage.getItem('POS_KHO'));
-let khoAo = JSON.parse(JSON.stringify(khoHienTai)); // Deep copy for virtual stock
+let khoAo = JSON.parse(JSON.stringify(khoHienTai));
 
 let currentMenu = JSON.parse(localStorage.getItem('POS_MENU'));
 if (!currentMenu) {
@@ -44,10 +158,9 @@ if (!currentMenu) {
     localStorage.setItem('POS_MENU', JSON.stringify(currentMenu));
 }
 
-let gioHang = []; // Array of cart items
+let gioHang = [];
 let currentCategory = 'Cà phê';
 
-// DOM Elements
 const menuGrid = document.getElementById('menu-grid');
 const categoriesContainer = document.querySelector('.menu-categories');
 const cartCount = document.getElementById('cart-count');
@@ -57,7 +170,7 @@ const cartTotalEl = document.getElementById('cart-total');
 const cartDrawer = document.getElementById('cart-drawer');
 const discountInput = document.getElementById('discount-input');
 
-// --- TÍNH TOÁN KHO ẢO ---
+// TÍNH TOÁN KHO ẢO
 function getIngredientName(id) {
     if (khoHienTai[id]) return khoHienTai[id].name;
     return id;
@@ -78,7 +191,7 @@ function calcMaxCups(recipeObj) {
     return minCups === Infinity ? 0 : minCups;
 }
 
-// --- RENDER MENU ---
+// RENDER MENU
 function renderCategories() {
     const cats = [...new Set(currentMenu.map(m => m.category))];
     categoriesContainer.innerHTML = '';
@@ -101,7 +214,6 @@ function renderMenu() {
     const items = currentMenu.filter(m => m.category === currentCategory);
 
     items.forEach(item => {
-        // Calculate max cups for M and L
         let maxM = 0;
         let maxL = 0;
         if (item.price.M) {
@@ -129,23 +241,21 @@ function renderMenu() {
     });
 }
 
-// --- XỬ LÝ CLICK MÓN ---
+// XỬ LÝ CLICK MÓN
 let tempSelectedItem = null;
 
 window.handleMenuClick = function (itemId, size) {
     const item = currentMenu.find(m => m.id === itemId);
 
     if (item.hasAddonSua || item.hasAddonMatcha || ['Cacao', 'Matcha', 'Khoai môn', 'Trà sữa', 'Tea'].includes(item.category)) {
-        // Open Modal
         tempSelectedItem = { item, size };
         openAddonModal(item, size);
     } else {
-        // Add direct
         addToCart(item, size, {}, []);
     }
 }
 
-// --- MODAL & ADDONS ---
+// MODAL & ADDONS
 const addonModal = document.getElementById('addon-modal');
 const closeBtn = document.getElementById('close-modal-btn');
 const milkGroup = document.getElementById('milk-options');
@@ -157,14 +267,12 @@ const toppingCheckboxes = document.getElementById('topping-checkbox-group');
 function openAddonModal(item, size) {
     document.getElementById('modal-drink-name').textContent = `${item.name} (Size ${size})`;
 
-    // Reset Modal state
     milkRadios.innerHTML = '';
     matchaRadios.innerHTML = '';
     toppingCheckboxes.innerHTML = '';
     milkGroup.classList.add('hidden');
     matchaGroup.classList.add('hidden');
 
-    // Build Milk Options
     if (item.hasAddonSua) {
         milkGroup.classList.remove('hidden');
         milkRadios.innerHTML = `
@@ -179,7 +287,6 @@ function openAddonModal(item, size) {
         `;
     }
 
-    // Build Matcha Options
     if (item.hasAddonMatcha) {
         matchaGroup.classList.remove('hidden');
         matchaRadios.innerHTML = `
@@ -194,7 +301,6 @@ function openAddonModal(item, size) {
         `;
     }
 
-    // Build Toppings
     ADDONS.topping.forEach((top, idx) => {
         toppingCheckboxes.innerHTML += `
             <label class="checkbox-item">
@@ -240,20 +346,16 @@ document.getElementById('add-to-cart-modal-btn').onclick = () => {
     addonModal.classList.remove('active');
 };
 
-// --- GIỎ HÀNG LOGIC ---
+// GIỎ HÀNG LOGIC
 function calculateRealRecipe(item, size, addonsData) {
-    // Clone recipe for 1 cup
     let recipe = { ...item.congThuc[size] };
-
-    // Override Milk
     if (addonsData.sua) {
         let amount = recipe['nl_sua_mlekovita'] || 0;
         if (amount > 0) {
             delete recipe['nl_sua_mlekovita'];
-            recipe[addonsData.sua.id] = amount; // Replace with oatside
+            recipe[addonsData.sua.id] = amount;
         }
     }
-    // Override Matcha
     if (addonsData.matcha) {
         let amount = recipe['nl_matcha_dai'] || 0;
         if (amount > 0) {
@@ -274,7 +376,6 @@ function calculateRealRecipe(item, size, addonsData) {
 function addToCart(item, size, addonsData) {
     const realRecipe = calculateRealRecipe(item, size, addonsData);
 
-    // Check virtual stock before adding
     let max = calcMaxCups(realRecipe);
     if (max <= 0) {
         alert('Kho không đủ nguyên liệu cho tùy chọn này!');
@@ -292,7 +393,6 @@ function addToCart(item, size, addonsData) {
         });
     }
 
-    // Generate Key
     const key = `${item.id}_${size}_${JSON.stringify(addonsData)}`;
 
     const existingIndex = gioHang.findIndex(x => x.key === key);
@@ -318,10 +418,8 @@ function addToCart(item, size, addonsData) {
 }
 
 function updateVirtualStock() {
-    // Reset virtual stock to current actual stock
     khoAo = JSON.parse(JSON.stringify(khoHienTai));
 
-    // Subtract all items in cart
     gioHang.forEach(cartItem => {
         const recipe = cartItem.recipe;
         for (let nl in recipe) {
@@ -331,7 +429,7 @@ function updateVirtualStock() {
         }
     });
 
-    renderMenu(); // Update menu buttons
+    renderMenu();
 }
 
 window.updateNote = function (index, value) {
@@ -343,7 +441,6 @@ window.changeQty = function (index, delta) {
     if (newQty <= 0) {
         gioHang.splice(index, 1);
     } else {
-        // Check if we can add more
         if (delta > 0) {
             let max = calcMaxCups(gioHang[index].recipe);
             if (max <= 0) {
@@ -441,31 +538,33 @@ window.toggleAccordion = function (btn) {
 }
 
 document.getElementById('apply-discount-btn').onclick = renderCart;
-discountInput.addEventListener('input', renderCart); // Live update discount
+discountInput.addEventListener('input', renderCart);
 
-// --- CART UI TOGGLE ---
+// CART UI TOGGLE
 const cartToggleBtn = document.getElementById('cart-toggle-btn');
 const closeCartBtn = document.getElementById('close-cart-btn');
 
 cartToggleBtn.onclick = () => cartDrawer.classList.add('open');
 closeCartBtn.onclick = () => cartDrawer.classList.remove('open');
 
-// --- THANH TOÁN ---
-document.getElementById('checkout-btn').onclick = () => {
+// THANH TOÁN
+function handleCheckout(paymentMethod) {
     if (gioHang.length === 0) return alert('Giỏ hàng trống!');
 
-    // Update actual stock
     khoHienTai = JSON.parse(JSON.stringify(khoAo));
     localStorage.setItem('POS_KHO', JSON.stringify(khoHienTai));
 
-    // Update Report
     const report = JSON.parse(localStorage.getItem('POS_BAOCAO'));
 
-    // Recalc total for revenue
     let finalTotal = parseInt(cartTotalEl.textContent.replace(/[^0-9]/g, ''));
     let totalLy = gioHang.reduce((sum, item) => sum + item.qty, 0);
 
     report.tongThu += finalTotal;
+    if (paymentMethod === 'tien_mat') {
+        report.tongThuTienMat = (report.tongThuTienMat || 0) + finalTotal;
+    } else if (paymentMethod === 'chuyen_khoan') {
+        report.tongThuChuyenKhoan = (report.tongThuChuyenKhoan || 0) + finalTotal;
+    }
     report.tongLy += totalLy;
 
     if (!report.chiTietBan) report.chiTietBan = {};
@@ -487,6 +586,7 @@ document.getElementById('checkout-btn').onclick = () => {
         id: Date.now(),
         time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
         total: finalTotal,
+        paymentMethod: paymentMethod,
         items: gioHang.map(i => ({ ...i }))
     };
     if (!report.orders) report.orders = [];
@@ -506,6 +606,9 @@ document.getElementById('checkout-btn').onclick = () => {
     renderInventory();
 }
 
+document.getElementById('checkout-cash-btn').onclick = () => handleCheckout('tien_mat');
+document.getElementById('checkout-transfer-btn').onclick = () => handleCheckout('chuyen_khoan');
+
 function showToast() {
     const toast = document.getElementById('toast');
     toast.classList.add('show');
@@ -514,7 +617,7 @@ function showToast() {
     }, 2000);
 }
 
-// --- TABS & INVENTORY LOGIC ---
+// TABS & INVENTORY LOGIC
 document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -523,7 +626,7 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.classList.add('active');
         document.getElementById(btn.dataset.target).classList.add('active');
 
-        if (btn.dataset.target === 'tab-inventory') {
+        if (btn.dataset.target === 'tab-inventory' || btn.dataset.target === 'tab-reports') {
             renderInventory();
         }
     });
@@ -532,7 +635,46 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
 function renderInventory() {
     const report = JSON.parse(localStorage.getItem('POS_BAOCAO'));
     document.getElementById('total-revenue').textContent = `${report.tongThu.toLocaleString('vi-VN')}đ`;
+    document.getElementById('total-cash').textContent = `${(report.tongThuTienMat || 0).toLocaleString('vi-VN')}đ`;
+    document.getElementById('total-transfer').textContent = `${(report.tongThuChuyenKhoan || 0).toLocaleString('vi-VN')}đ`;
+    document.getElementById('total-expense').textContent = `${(report.tongChi || 0).toLocaleString('vi-VN')}đ`;
     document.getElementById('total-cups').textContent = report.tongLy;
+
+    // Cập nhật Báo Cáo Tháng 
+    const monthStats = revenueHistory.getMonthlyTotal(report);
+    const monthTotalEl = document.getElementById('month-total-revenue');
+    if (monthTotalEl) {
+        monthTotalEl.textContent = `${monthStats.tongThu.toLocaleString('vi-VN')}đ`;
+        document.getElementById('month-total-cash').textContent = `${monthStats.tongThuTienMat.toLocaleString('vi-VN')}đ`;
+        document.getElementById('month-total-transfer').textContent = `${monthStats.tongThuChuyenKhoan.toLocaleString('vi-VN')}đ`;
+        document.getElementById('month-total-expense').textContent = `${(monthStats.tongChi || 0).toLocaleString('vi-VN')}đ`;
+        document.getElementById('month-total-cups').textContent = monthStats.tongLy;
+
+        const historyList = document.getElementById('monthly-history-list');
+        historyList.innerHTML = '';
+        const dailyRecords = revenueHistory.data.dailyRecords;
+        const sortedDates = Object.keys(dailyRecords).sort((a, b) => new Date(b) - new Date(a));
+
+        if (sortedDates.length === 0) {
+            historyList.innerHTML = '<div style="padding: 10px; color: #888;">Chưa có dữ liệu chốt ca trong chu kỳ này.</div>';
+        } else {
+            sortedDates.forEach(date => {
+                const rec = dailyRecords[date];
+                historyList.innerHTML += `
+                    <div class="inv-row" style="flex-direction: column; align-items: flex-start;">
+                        <div style="font-weight: bold; margin-bottom: 5px; color: var(--text-main);">Ngày ${date}</div>
+                        <div style="display: flex; justify-content: space-between; width: 100%; font-size: 0.9rem; flex-wrap: wrap; gap: 5px;">
+                            <span>Thu: <span style="color: var(--primary-color); font-weight: bold;">${rec.tongThu.toLocaleString('vi-VN')}đ</span></span>
+                            <span>TM: <span style="color: #28a745;">${rec.tongThuTienMat.toLocaleString('vi-VN')}đ</span></span>
+                            <span>CK: <span style="color: #007bff;">${rec.tongThuChuyenKhoan.toLocaleString('vi-VN')}đ</span></span>
+                            <span>Chi: <span style="color: #dc3545;">${(rec.tongChi || 0).toLocaleString('vi-VN')}đ</span></span>
+                            <span>Bán: <span>${rec.tongLy} ly</span></span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+    }
 
     const detailList = document.getElementById('sales-detail-list');
     if (detailList) {
@@ -577,10 +719,18 @@ function renderInventory() {
                         if (i.note && i.note.trim() !== '') s += ` (Ghi chú: ${i.note.trim()})`;
                         return s;
                     }).join(', ');
+
+                    let paymentBadge = '';
+                    if (order.paymentMethod === 'tien_mat') {
+                        paymentBadge = '<span style="color: #28a745; font-weight: bold; margin-left: 10px;">[TIỀN MẶT]</span>';
+                    } else if (order.paymentMethod === 'chuyen_khoan') {
+                        paymentBadge = '<span style="color: #007bff; font-weight: bold; margin-left: 10px;">[CHUYỂN KHOẢN]</span>';
+                    }
+
                     recentOrdersList.innerHTML += `
                         <div class="order-history-item">
                             <div class="order-info">
-                                <span class="order-time"><i class="far fa-clock"></i> ${order.time}</span>
+                                <span class="order-time"><i class="far fa-clock"></i> ${order.time} ${paymentBadge}</span>
                                 <span style="font-size: 0.9rem;">${itemSummary}</span>
                                 <span class="order-total">${order.total.toLocaleString('vi-VN')}đ</span>
                             </div>
@@ -612,20 +762,21 @@ function renderInventory() {
 document.getElementById('add-expense-btn').onclick = () => {
     const descInput = document.getElementById('expense-desc');
     const amountInput = document.getElementById('expense-amount');
-    
+
     const desc = descInput.value.trim();
     const amount = parseInt(amountInput.value);
-    
+
     if (!desc || isNaN(amount) || amount <= 0) {
         alert('Vui lòng nhập nội dung và số tiền hợp lệ!');
         return;
     }
-    
+
     const report = JSON.parse(localStorage.getItem('POS_BAOCAO'));
-    
-    // Trừ doanh thu (Cho phép âm)
+
+    // Trừ doanh thu 
     report.tongThu -= amount;
-    
+    report.tongChi = (report.tongChi || 0) + amount;
+
     // Tạo bill chi tiền
     const orderObj = {
         id: Date.now(),
@@ -635,16 +786,16 @@ document.getElementById('add-expense-btn').onclick = () => {
         isExpense: true,
         desc: desc
     };
-    
+
     if (!report.orders) report.orders = [];
     report.orders.unshift(orderObj);
     if (report.orders.length > 50) report.orders.pop();
-    
+
     localStorage.setItem('POS_BAOCAO', JSON.stringify(report));
-    
+
     descInput.value = '';
     amountInput.value = '';
-    
+
     renderInventory();
     alert('Đã ghi nhận khoản chi!');
 };
@@ -676,19 +827,22 @@ document.getElementById('reset-inventory-btn').onclick = () => {
 }
 
 document.getElementById('close-shift-btn').onclick = () => {
-    if (confirm('Bạn có chắc chắn chốt ca? (Doanh thu sẽ về 0, tồn kho vẫn giữ nguyên)')) {
-        localStorage.setItem('POS_BAOCAO', JSON.stringify({ tongThu: 0, tongLy: 0, chiTietBan: {} }));
+    if (confirm('Bạn có chắc chắn chốt ca? (Doanh thu hiện tại sẽ được cộng vào Lịch sử tháng, sau đó reset về 0)')) {
+        const report = JSON.parse(localStorage.getItem('POS_BAOCAO'));
+        revenueHistory.addShiftData(report); // Lưu vào struct lịch sử hằng ngày
+
+        localStorage.setItem('POS_BAOCAO', JSON.stringify({ tongThu: 0, tongThuTienMat: 0, tongThuChuyenKhoan: 0, tongLy: 0, tongChi: 0, chiTietBan: {}, orders: [] }));
         renderInventory();
-        alert('Chốt ca thành công!');
+        alert('Chốt ca thành công! Doanh thu đã được lưu vào Báo Cáo Tháng.');
     }
 }
 
-// --- INIT APP ---
+// INIT APP
 renderCategories();
 renderMenu();
 renderCart();
 
-// --- VOID ORDER ---
+// VOID ORDER
 window.voidOrder = function (orderId) {
     if (!confirm('Bạn có chắc chắn muốn hủy giao dịch này?')) return;
 
@@ -702,9 +856,15 @@ window.voidOrder = function (orderId) {
     if (order.isExpense) {
         // Hủy chi tiền -> cộng lại doanh thu
         report.tongThu += order.total;
+        report.tongChi = (report.tongChi || 0) - order.total;
     } else {
         // Hủy đơn hàng -> trừ doanh thu
         report.tongThu -= order.total;
+        if (order.paymentMethod === 'tien_mat') {
+            report.tongThuTienMat -= order.total;
+        } else if (order.paymentMethod === 'chuyen_khoan') {
+            report.tongThuChuyenKhoan -= order.total;
+        }
 
         let totalCups = order.items.reduce((sum, item) => sum + item.qty, 0);
         report.tongLy -= totalCups;
@@ -744,7 +904,7 @@ window.voidOrder = function (orderId) {
     alert('Hủy giao dịch thành công!');
 }
 
-// --- WAKE LOCK API ---
+// WAKE LOCK API
 let wakeLock = null;
 async function requestWakeLock() {
     try {
@@ -780,7 +940,7 @@ window.toggleSection = function (id, btn) {
     }
 }
 
-// --- RECIPE EDITOR LOGIC ---
+// RECIPE EDITOR LOGIC
 const recipeSelect = document.getElementById('recipe-select');
 const recipeEditorContainer = document.getElementById('recipe-editor-container');
 const recipeSizeTabs = document.getElementById('recipe-size-tabs');
@@ -811,18 +971,17 @@ recipeSelect.addEventListener('change', (e) => {
         recipeEditorContainer.style.display = 'none';
         return;
     }
-    
+
     const item = currentMenu.find(m => m.id === selectedRecipeId);
     recipeEditorContainer.style.display = 'block';
-    
-    // Setup size tabs
+
     recipeSizeTabs.innerHTML = '';
     const sizes = Object.keys(item.congThuc);
     if (sizes.length === 0) {
         recipeEditorContainer.style.display = 'none';
         return;
     }
-    
+
     sizes.forEach(size => {
         const btn = document.createElement('button');
         btn.className = `btn-size`;
@@ -830,15 +989,14 @@ recipeSelect.addEventListener('change', (e) => {
         btn.onclick = () => loadRecipeSize(size);
         recipeSizeTabs.appendChild(btn);
     });
-    
+
     loadRecipeSize(sizes[0]);
 });
 
 function loadRecipeSize(size) {
     editingSize = size;
     currentRecipeSizeSpan.textContent = size;
-    
-    // Update active tab style
+
     Array.from(recipeSizeTabs.children).forEach(btn => {
         if (btn.textContent === `Size ${size}`) {
             btn.classList.add('active');
@@ -848,7 +1006,7 @@ function loadRecipeSize(size) {
             btn.style.boxShadow = 'none';
         }
     });
-    
+
     renderRecipeIngredients();
 }
 
@@ -856,12 +1014,12 @@ function renderRecipeIngredients() {
     recipeIngredientsList.innerHTML = '';
     const item = currentMenu.find(m => m.id === selectedRecipeId);
     const recipe = item.congThuc[editingSize];
-    
+
     for (let nl_id in recipe) {
         const qty = recipe[nl_id];
         const nlName = getIngredientName(nl_id);
         const nlUnit = getIngredientUnit(nl_id);
-        
+
         recipeIngredientsList.innerHTML += `
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-main);">
                 <div style="flex: 1; font-weight: 500;">${nlName}</div>
@@ -875,7 +1033,7 @@ function renderRecipeIngredients() {
     }
 }
 
-window.removeRecipeIngredient = function(nl_id) {
+window.removeRecipeIngredient = function (nl_id) {
     const item = currentMenu.find(m => m.id === selectedRecipeId);
     delete item.congThuc[editingSize][nl_id];
     renderRecipeIngredients();
@@ -884,27 +1042,27 @@ window.removeRecipeIngredient = function(nl_id) {
 document.getElementById('add-ingredient-btn').onclick = () => {
     const nl_id = addIngredientSelect.value;
     const qty = parseFloat(document.getElementById('add-ingredient-qty').value);
-    
+
     if (!nl_id || isNaN(qty) || qty <= 0) {
         alert('Vui lòng chọn nguyên liệu và nhập số lượng hợp lệ!');
         return;
     }
-    
+
     const item = currentMenu.find(m => m.id === selectedRecipeId);
     item.congThuc[editingSize][nl_id] = qty;
-    
+
     document.getElementById('add-ingredient-qty').value = '';
     addIngredientSelect.value = '';
-    
+
     renderRecipeIngredients();
 };
 
 document.getElementById('save-recipe-btn').onclick = () => {
     if (!selectedRecipeId || !editingSize) return;
-    
+
     const item = currentMenu.find(m => m.id === selectedRecipeId);
     const inputs = document.querySelectorAll('.recipe-qty-input');
-    
+
     inputs.forEach(input => {
         const nl_id = input.dataset.nl;
         const qty = parseFloat(input.value);
@@ -912,7 +1070,7 @@ document.getElementById('save-recipe-btn').onclick = () => {
             item.congThuc[editingSize][nl_id] = qty;
         }
     });
-    
+
     localStorage.setItem('POS_MENU', JSON.stringify(currentMenu));
     updateVirtualStock(); // Cập nhật lại kho ảo và nút bấm
     alert('Đã lưu công thức thành công!');

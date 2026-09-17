@@ -47,7 +47,10 @@
                     <span id="cart-total" class="price">0đ</span>
                 </div>
 
-                <button id="checkout-btn" class="checkout-btn">Thanh Toán</button>
+                <div class="checkout-actions" style="display: flex; gap: 10px;">
+                    <button id="checkout-cash-btn" class="checkout-btn" style="flex: 1; background-color: #28a745; margin-top: 0; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);">Tiền mặt</button>
+                    <button id="checkout-transfer-btn" class="checkout-btn" style="flex: 1; background-color: #007bff; margin-top: 0; box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);">Chuyển khoản</button>
+                </div>
             </div>
         </div>
 
@@ -57,19 +60,8 @@
             <span id="floating-cart-count" class="badge">0</span>
         </button>
 
-        <!-- TAB 2: KHO & DOANH THU -->
+        <!-- TAB 2: KHO & GIAO DỊCH -->
         <main id="tab-inventory" class="tab-content">
-            <div class="dashboard-cards">
-                <div class="card bg-gradient-primary">
-                    <h3>Tổng Thu</h3>
-                    <p id="total-revenue">0đ</p>
-                </div>
-                <div class="card bg-gradient-secondary">
-                    <h3>Ly Đã Bán</h3>
-                    <p id="total-cups">0</p>
-                </div>
-            </div>
-
             <div class="section-header mt-20" style="margin-top: 20px;">
                 <h2>Ghi Nhận Khoản Chi</h2>
                 <button class="collapse-btn" onclick="toggleSection('expense-section', this)"><i class="fas fa-chevron-up"></i></button>
@@ -108,8 +100,6 @@
             <div id="inventory-list" class="inventory-list">
                 <!-- Inventory rows generated here -->
             </div>
-
-            <button id="close-shift-btn" class="btn-danger full-width mt-20">Chốt Ca & Reset Báo Cáo</button>
         </main>
 
         <!-- TAB 3: CÔNG THỨC -->
@@ -145,6 +135,69 @@
                 <button id="save-recipe-btn" class="btn-primary full-width">Lưu Công Thức Này</button>
             </div>
         </main>
+
+        <!-- TAB 4: BÁO CÁO -->
+        <main id="tab-reports" class="tab-content">
+            <div class="section-header mt-20" style="margin-top: 20px;">
+                <h2>Báo Cáo Ca Hiện Tại</h2>
+            </div>
+            <div class="dashboard-cards" style="margin-bottom: 20px;">
+                <div class="card" style="grid-column: span 2; background: #fff; border: 2px solid #a67c52; border-radius: 12px; padding: 15px;">
+                    <h3 style="color: var(--text-muted); font-size: 0.9rem;">Tổng Thu (Thực tế)</h3>
+                    <p id="total-revenue" style="color: var(--text-main);">0đ</p>
+                </div>
+                <div class="card" style="background: #fff; border: 2px solid #a67c52; border-radius: 12px; padding: 15px;">
+                    <h3 style="color: var(--text-muted); font-size: 0.9rem;">Tiền Mặt</h3>
+                    <p id="total-cash" style="color: var(--text-main);">0đ</p>
+                </div>
+                <div class="card" style="background: #fff; border: 2px solid #a67c52; border-radius: 12px; padding: 15px;">
+                    <h3 style="color: var(--text-muted); font-size: 0.9rem;">Chuyển Khoản</h3>
+                    <p id="total-transfer" style="color: var(--text-main);">0đ</p>
+                </div>
+                <div class="card" style="background: #fff; border: 2px solid #a67c52; border-radius: 12px; padding: 15px;">
+                    <h3 style="color: var(--text-muted); font-size: 0.9rem;">Tiền Trừ (Chi)</h3>
+                    <p id="total-expense" style="color: var(--text-main);">0đ</p>
+                </div>
+                <div class="card" style="background: #fff; border: 2px solid #a67c52; border-radius: 12px; padding: 15px;">
+                    <h3 style="color: var(--text-muted); font-size: 0.9rem;">Ly Đã Bán</h3>
+                    <p id="total-cups" style="color: var(--text-main);">0</p>
+                </div>
+            </div>
+
+            <div class="section-header mt-20" style="margin-top: 20px;">
+                <h2>Báo Cáo Tháng (Tự reset vào ngày 2)</h2>
+                <button class="collapse-btn" onclick="toggleSection('monthly-report-section', this)"><i class="fas fa-chevron-up"></i></button>
+            </div>
+            <div id="monthly-report-section" style="margin-bottom: 20px;">
+                <div class="dashboard-cards" style="margin-bottom: 10px;">
+                    <div class="card" style="grid-column: span 2; background: #fff; border: 2px solid #a67c52; border-radius: 12px; padding: 15px;">
+                        <h3 style="color: var(--text-muted); font-size: 0.9rem;">Tổng Thu Tháng</h3>
+                        <p id="month-total-revenue" style="color: var(--text-main);">0đ</p>
+                    </div>
+                    <div class="card" style="background: #fff; border: 2px solid #a67c52; border-radius: 12px; padding: 15px;">
+                        <h3 style="color: var(--text-muted); font-size: 0.9rem;">Tiền Mặt</h3>
+                        <p id="month-total-cash" style="color: var(--text-main);">0đ</p>
+                    </div>
+                    <div class="card" style="background: #fff; border: 2px solid #a67c52; border-radius: 12px; padding: 15px;">
+                        <h3 style="color: var(--text-muted); font-size: 0.9rem;">Chuyển Khoản</h3>
+                        <p id="month-total-transfer" style="color: var(--text-main);">0đ</p>
+                    </div>
+                    <div class="card" style="background: #fff; border: 2px solid #a67c52; border-radius: 12px; padding: 15px;">
+                        <h3 style="color: var(--text-muted); font-size: 0.9rem;">Tiền Trừ Tháng</h3>
+                        <p id="month-total-expense" style="color: var(--text-main);">0đ</p>
+                    </div>
+                    <div class="card" style="background: #fff; border: 2px solid #a67c52; border-radius: 12px; padding: 15px;">
+                        <h3 style="color: var(--text-muted); font-size: 0.9rem;">Ly Đã Bán Tháng</h3>
+                        <p id="month-total-cups" style="color: var(--text-main);">0</p>
+                    </div>
+                </div>
+                <div id="monthly-history-list" class="inventory-list" style="background: #fff; border-radius: 12px; padding: 10px; max-height: 300px; overflow-y: auto;">
+                    <!-- Lịch sử chốt ca từng ngày sẽ được render ở đây -->
+                </div>
+            </div>
+
+            <button id="close-shift-btn" class="btn-danger full-width mt-20" style="margin-bottom: 30px;">Chốt Ca & Reset Báo Cáo</button>
+        </main>
         <!-- BOTTOM NAVIGATION -->
         <nav class="bottom-nav">
             <button class="nav-btn active" data-target="tab-sales">
@@ -153,7 +206,11 @@
             </button>
             <button class="nav-btn" data-target="tab-inventory">
                 <i class="fas fa-box"></i>
-                <span>Kho & Doanh Thu</span>
+                <span>Kho & Giao Dịch</span>
+            </button>
+            <button class="nav-btn" data-target="tab-reports">
+                <i class="fas fa-chart-line"></i>
+                <span>Báo Cáo</span>
             </button>
             <button class="nav-btn" data-target="tab-recipes">
                 <i class="fas fa-book-open"></i>
