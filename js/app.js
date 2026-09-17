@@ -23,19 +23,22 @@ function initData() {
 
     let baocao = JSON.parse(localStorage.getItem('POS_BAOCAO'));
     if (!baocao) {
-        baocao = { tongThu: 0, tongThuTienMat: 0, tongThuChuyenKhoan: 0, tongLy: 0, tongChi: 0, chiTietBan: {}, orders: [] };
+        baocao = { tongThu: 0, tongLy: 0, tongChi: 0, chiTietBan: {}, orders: [], migratedGross: true };
         localStorage.setItem('POS_BAOCAO', JSON.stringify(baocao));
     } else {
         if (!baocao.chiTietBan) baocao.chiTietBan = {};
         if (!baocao.orders) baocao.orders = [];
-        if (typeof baocao.tongThuTienMat === 'undefined') baocao.tongThuTienMat = 0;
-        if (typeof baocao.tongThuChuyenKhoan === 'undefined') baocao.tongThuChuyenKhoan = 0;
         if (typeof baocao.tongChi === 'undefined') {
             let sumChi = 0;
             baocao.orders.forEach(o => {
                 if (o.isExpense) sumChi += o.total;
             });
             baocao.tongChi = sumChi;
+        }
+
+        if (!baocao.migratedGross) {
+            baocao.tongThu += (baocao.tongChi || 0);
+            baocao.migratedGross = true;
         }
 
         localStorage.setItem('POS_BAOCAO', JSON.stringify(baocao));
@@ -72,13 +75,24 @@ class RevenueHistory {
             this.data = {
                 lastResetMonth: currentPeriod.m,
                 lastResetYear: currentPeriod.y,
-                dailyRecords: {} // key: 'YYYY-MM-DD', value: { tongThu, tongThuTienMat, tongThuChuyenKhoan, tongLy }
+                dailyRecords: {},
+                migratedGross: true
             };
             this.save();
         } else {
             this.data = data;
             if (this.data.lastResetYear === undefined) {
                 this.data.lastResetYear = new Date().getFullYear();
+            }
+            if (!this.data.migratedGross) {
+                for (let date in this.data.dailyRecords) {
+                    let record = this.data.dailyRecords[date];
+                    if (record.tongChi) {
+                        record.tongThu += record.tongChi;
+                    }
+                }
+                this.data.migratedGross = true;
+                this.save();
             }
         }
     }
@@ -102,7 +116,8 @@ class RevenueHistory {
     }
 
     addShiftData(reportData) {
-        const todayStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+        const now = new Date();
+        const todayStr = String(now.getDate()).padStart(2, '0') + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getFullYear()).padStart(4, '0'); // YYYY-MM-DD local time
 
         if (!this.data.dailyRecords[todayStr]) {
             this.data.dailyRecords[todayStr] = {
@@ -548,7 +563,7 @@ cartToggleBtn.onclick = () => cartDrawer.classList.add('open');
 closeCartBtn.onclick = () => cartDrawer.classList.remove('open');
 
 // THANH TOÁN
-function handleCheckout(paymentMethod) {
+function handleCheckout() {
     if (gioHang.length === 0) return alert('Giỏ hàng trống!');
 
     khoHienTai = JSON.parse(JSON.stringify(khoAo));
@@ -560,11 +575,6 @@ function handleCheckout(paymentMethod) {
     let totalLy = gioHang.reduce((sum, item) => sum + item.qty, 0);
 
     report.tongThu += finalTotal;
-    if (paymentMethod === 'tien_mat') {
-        report.tongThuTienMat = (report.tongThuTienMat || 0) + finalTotal;
-    } else if (paymentMethod === 'chuyen_khoan') {
-        report.tongThuChuyenKhoan = (report.tongThuChuyenKhoan || 0) + finalTotal;
-    }
     report.tongLy += totalLy;
 
     if (!report.chiTietBan) report.chiTietBan = {};
@@ -586,7 +596,6 @@ function handleCheckout(paymentMethod) {
         id: Date.now(),
         time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
         total: finalTotal,
-        paymentMethod: paymentMethod,
         items: gioHang.map(i => ({ ...i }))
     };
     if (!report.orders) report.orders = [];
@@ -606,8 +615,7 @@ function handleCheckout(paymentMethod) {
     renderInventory();
 }
 
-document.getElementById('checkout-cash-btn').onclick = () => handleCheckout('tien_mat');
-document.getElementById('checkout-transfer-btn').onclick = () => handleCheckout('chuyen_khoan');
+document.getElementById('checkout-btn').onclick = () => handleCheckout();
 
 function showToast() {
     const toast = document.getElementById('toast');
@@ -634,9 +642,9 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
 
 function renderInventory() {
     const report = JSON.parse(localStorage.getItem('POS_BAOCAO'));
+    const netTotal = report.tongThu - (report.tongChi || 0);
+    document.getElementById('total-net').textContent = `${netTotal.toLocaleString('vi-VN')}đ`;
     document.getElementById('total-revenue').textContent = `${report.tongThu.toLocaleString('vi-VN')}đ`;
-    document.getElementById('total-cash').textContent = `${(report.tongThuTienMat || 0).toLocaleString('vi-VN')}đ`;
-    document.getElementById('total-transfer').textContent = `${(report.tongThuChuyenKhoan || 0).toLocaleString('vi-VN')}đ`;
     document.getElementById('total-expense').textContent = `${(report.tongChi || 0).toLocaleString('vi-VN')}đ`;
     document.getElementById('total-cups').textContent = report.tongLy;
 
@@ -644,9 +652,9 @@ function renderInventory() {
     const monthStats = revenueHistory.getMonthlyTotal(report);
     const monthTotalEl = document.getElementById('month-total-revenue');
     if (monthTotalEl) {
+        const monthNet = monthStats.tongThu - (monthStats.tongChi || 0);
+        document.getElementById('month-total-net').textContent = `${monthNet.toLocaleString('vi-VN')}đ`;
         monthTotalEl.textContent = `${monthStats.tongThu.toLocaleString('vi-VN')}đ`;
-        document.getElementById('month-total-cash').textContent = `${monthStats.tongThuTienMat.toLocaleString('vi-VN')}đ`;
-        document.getElementById('month-total-transfer').textContent = `${monthStats.tongThuChuyenKhoan.toLocaleString('vi-VN')}đ`;
         document.getElementById('month-total-expense').textContent = `${(monthStats.tongChi || 0).toLocaleString('vi-VN')}đ`;
         document.getElementById('month-total-cups').textContent = monthStats.tongLy;
 
@@ -664,9 +672,8 @@ function renderInventory() {
                     <div class="inv-row" style="flex-direction: column; align-items: flex-start;">
                         <div style="font-weight: bold; margin-bottom: 5px; color: var(--text-main);">Ngày ${date}</div>
                         <div style="display: flex; justify-content: space-between; width: 100%; font-size: 0.9rem; flex-wrap: wrap; gap: 5px;">
-                            <span>Thu: <span style="color: var(--primary-color); font-weight: bold;">${rec.tongThu.toLocaleString('vi-VN')}đ</span></span>
-                            <span>TM: <span style="color: #28a745;">${rec.tongThuTienMat.toLocaleString('vi-VN')}đ</span></span>
-                            <span>CK: <span style="color: #007bff;">${rec.tongThuChuyenKhoan.toLocaleString('vi-VN')}đ</span></span>
+                            <span>Tổng: <span style="font-weight: bold;">${(rec.tongThu - (rec.tongChi || 0)).toLocaleString('vi-VN')}đ</span></span>
+                            <span>Thu: <span style="color: var(--primary-color);">${rec.tongThu.toLocaleString('vi-VN')}đ</span></span>
                             <span>Chi: <span style="color: #dc3545;">${(rec.tongChi || 0).toLocaleString('vi-VN')}đ</span></span>
                             <span>Bán: <span>${rec.tongLy} ly</span></span>
                         </div>
@@ -720,17 +727,10 @@ function renderInventory() {
                         return s;
                     }).join(', ');
 
-                    let paymentBadge = '';
-                    if (order.paymentMethod === 'tien_mat') {
-                        paymentBadge = '<span style="color: #28a745; font-weight: bold; margin-left: 10px;">[TIỀN MẶT]</span>';
-                    } else if (order.paymentMethod === 'chuyen_khoan') {
-                        paymentBadge = '<span style="color: #007bff; font-weight: bold; margin-left: 10px;">[CHUYỂN KHOẢN]</span>';
-                    }
-
                     recentOrdersList.innerHTML += `
                         <div class="order-history-item">
                             <div class="order-info">
-                                <span class="order-time"><i class="far fa-clock"></i> ${order.time} ${paymentBadge}</span>
+                                <span class="order-time"><i class="far fa-clock"></i> ${order.time}</span>
                                 <span style="font-size: 0.9rem;">${itemSummary}</span>
                                 <span class="order-total">${order.total.toLocaleString('vi-VN')}đ</span>
                             </div>
@@ -773,8 +773,7 @@ document.getElementById('add-expense-btn').onclick = () => {
 
     const report = JSON.parse(localStorage.getItem('POS_BAOCAO'));
 
-    // Trừ doanh thu 
-    report.tongThu -= amount;
+    // Ghi nhận tiền chi (không trừ vào tiền thu nữa)
     report.tongChi = (report.tongChi || 0) + amount;
 
     // Tạo bill chi tiền
@@ -854,17 +853,11 @@ window.voidOrder = function (orderId) {
     const order = orders[orderIndex];
 
     if (order.isExpense) {
-        // Hủy chi tiền -> cộng lại doanh thu
-        report.tongThu += order.total;
+        // Hủy chi tiền
         report.tongChi = (report.tongChi || 0) - order.total;
     } else {
         // Hủy đơn hàng -> trừ doanh thu
         report.tongThu -= order.total;
-        if (order.paymentMethod === 'tien_mat') {
-            report.tongThuTienMat -= order.total;
-        } else if (order.paymentMethod === 'chuyen_khoan') {
-            report.tongThuChuyenKhoan -= order.total;
-        }
 
         let totalCups = order.items.reduce((sum, item) => sum + item.qty, 0);
         report.tongLy -= totalCups;

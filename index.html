@@ -47,9 +47,8 @@
                     <span id="cart-total" class="price">0đ</span>
                 </div>
 
-                <div class="checkout-actions" style="display: flex; gap: 10px;">
-                    <button id="checkout-cash-btn" class="checkout-btn" style="flex: 1; background-color: #28a745; margin-top: 0; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);">Tiền mặt</button>
-                    <button id="checkout-transfer-btn" class="checkout-btn" style="flex: 1; background-color: #007bff; margin-top: 0; box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);">Chuyển khoản</button>
+                <div class="checkout-actions">
+                    <button id="checkout-btn" class="checkout-btn" style="width: 100%; background-color: #28a745; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);">Thanh toán</button>
                 </div>
             </div>
         </div>
@@ -143,19 +142,15 @@
             </div>
             <div class="dashboard-cards" style="margin-bottom: 20px;">
                 <div class="card" style="grid-column: span 2; background: #fff; border: 2px solid #a67c52; border-radius: 12px; padding: 15px;">
-                    <h3 style="color: var(--text-muted); font-size: 0.9rem;">Tổng Thu (Thực tế)</h3>
+                    <h3 style="color: var(--text-muted); font-size: 0.9rem;">Tổng (Thực nhận)</h3>
+                    <p id="total-net" style="color: var(--text-main);">0đ</p>
+                </div>
+                <div class="card" style="background: #fff; border: 2px solid #a67c52; border-radius: 12px; padding: 15px;">
+                    <h3 style="color: var(--text-muted); font-size: 0.9rem;">Tiền Thu</h3>
                     <p id="total-revenue" style="color: var(--text-main);">0đ</p>
                 </div>
                 <div class="card" style="background: #fff; border: 2px solid #a67c52; border-radius: 12px; padding: 15px;">
-                    <h3 style="color: var(--text-muted); font-size: 0.9rem;">Tiền Mặt</h3>
-                    <p id="total-cash" style="color: var(--text-main);">0đ</p>
-                </div>
-                <div class="card" style="background: #fff; border: 2px solid #a67c52; border-radius: 12px; padding: 15px;">
-                    <h3 style="color: var(--text-muted); font-size: 0.9rem;">Chuyển Khoản</h3>
-                    <p id="total-transfer" style="color: var(--text-main);">0đ</p>
-                </div>
-                <div class="card" style="background: #fff; border: 2px solid #a67c52; border-radius: 12px; padding: 15px;">
-                    <h3 style="color: var(--text-muted); font-size: 0.9rem;">Tiền Trừ (Chi)</h3>
+                    <h3 style="color: var(--text-muted); font-size: 0.9rem;">Tiền Chi</h3>
                     <p id="total-expense" style="color: var(--text-main);">0đ</p>
                 </div>
                 <div class="card" style="background: #fff; border: 2px solid #a67c52; border-radius: 12px; padding: 15px;">
@@ -171,19 +166,15 @@
             <div id="monthly-report-section" style="margin-bottom: 20px;">
                 <div class="dashboard-cards" style="margin-bottom: 10px;">
                     <div class="card" style="grid-column: span 2; background: #fff; border: 2px solid #a67c52; border-radius: 12px; padding: 15px;">
-                        <h3 style="color: var(--text-muted); font-size: 0.9rem;">Tổng Thu Tháng</h3>
+                        <h3 style="color: var(--text-muted); font-size: 0.9rem;">Tổng Tháng (Thực nhận)</h3>
+                        <p id="month-total-net" style="color: var(--text-main);">0đ</p>
+                    </div>
+                    <div class="card" style="background: #fff; border: 2px solid #a67c52; border-radius: 12px; padding: 15px;">
+                        <h3 style="color: var(--text-muted); font-size: 0.9rem;">Tiền Thu Tháng</h3>
                         <p id="month-total-revenue" style="color: var(--text-main);">0đ</p>
                     </div>
                     <div class="card" style="background: #fff; border: 2px solid #a67c52; border-radius: 12px; padding: 15px;">
-                        <h3 style="color: var(--text-muted); font-size: 0.9rem;">Tiền Mặt</h3>
-                        <p id="month-total-cash" style="color: var(--text-main);">0đ</p>
-                    </div>
-                    <div class="card" style="background: #fff; border: 2px solid #a67c52; border-radius: 12px; padding: 15px;">
-                        <h3 style="color: var(--text-muted); font-size: 0.9rem;">Chuyển Khoản</h3>
-                        <p id="month-total-transfer" style="color: var(--text-main);">0đ</p>
-                    </div>
-                    <div class="card" style="background: #fff; border: 2px solid #a67c52; border-radius: 12px; padding: 15px;">
-                        <h3 style="color: var(--text-muted); font-size: 0.9rem;">Tiền Trừ Tháng</h3>
+                        <h3 style="color: var(--text-muted); font-size: 0.9rem;">Tiền Chi Tháng</h3>
                         <p id="month-total-expense" style="color: var(--text-main);">0đ</p>
                     </div>
                     <div class="card" style="background: #fff; border: 2px solid #a67c52; border-radius: 12px; padding: 15px;">
