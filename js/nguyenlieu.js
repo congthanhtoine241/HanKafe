@@ -39,6 +39,10 @@ const KHO_MAC_DINH = [
     { id: 'nl_nuoc_cam', name: 'Nước Cam', stock: 1000, unit: 'ml' },
     { id: 'nl_nuoc_am', name: 'Nước Ấm', stock: 100000, unit: 'ml' },
     { id: 'nl_nuoc_dua', name: 'Nước Dừa', stock: 1000, unit: 'ml' },
+    { id: 'nl_siroluu', name: 'Siro Lựu', stock: 1000, unit: 'ml' },
+    { id: 'nl_siroatiso', name: 'Siro Atiso', stock: 1000, unit: 'ml' },
+    { id: 'nl_hatluu', name: 'Hạt lựu', stock: 1000, unit: 'g' },
+    { id: 'nl_thachdua', name: 'Thạch dừa', stock: 1000, unit: 'g' }
 ];
 
 // Khai báo Addons
@@ -57,6 +61,7 @@ const ADDONS = {
         { id: 'nl_cunang', name: 'Thạch củ năng', price: 5000, qty: 30 },
         { id: 'nl_suongsao', name: 'Sương sáo', price: 5000, qty: 30 },
         { id: 'nl_kemmuoi', name: 'Kem muối', price: 5000, qty: 30 },
-        { id: 'nl_kemdeo', name: 'Kem dẻo', price: 5000, qty: 30 }
+        { id: 'nl_kemdeo', name: 'Kem dẻo', price: 5000, qty: 30 },
+        { id: 'nl_thachdua', name: 'Thạch dừa', price: 5000, qty: 30 }
     ]
 };

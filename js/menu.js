@@ -231,5 +231,13 @@ const MENU = [
         congThuc: {
             L: { nl_tralai: 150, nl_chunkyvai: 40, nl_syrupvai: 30, nl_duong: 20, nl_cunang: 30, nl_vaimieng: 1, nl_tac: 1, nl_ly_l: 1 }
         }
+    },
+    {
+        id: 'tra_luu_hibiscus', name: 'Trà lựu hibiscus', category: 'Tea', icon: '🍹',
+        price: { L: 25000 },
+        hasAddonSua: false, hasAddonMatcha: false,
+        congThuc: {
+            L: { nl_tralai: 150, nl_siroluu: 20, nl_duong: 10, nl_siroatiso: 30, nl_tac: 1, nl_hatluu: 30, nl_thachdua: 30, nl_ly_l: 1 }
+        }
     }
 ];

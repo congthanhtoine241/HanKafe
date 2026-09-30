@@ -262,12 +262,8 @@ let tempSelectedItem = null;
 window.handleMenuClick = function (itemId, size) {
     const item = currentMenu.find(m => m.id === itemId);
 
-    if (item.hasAddonSua || item.hasAddonMatcha || ['Cacao', 'Matcha', 'Khoai môn', 'Trà sữa', 'Tea'].includes(item.category)) {
-        tempSelectedItem = { item, size };
-        openAddonModal(item, size);
-    } else {
-        addToCart(item, size, {}, []);
-    }
+    tempSelectedItem = { item, size };
+    openAddonModal(item, size);
 }
 
 // MODAL & ADDONS
