@@ -199,7 +199,7 @@ const MENU = [
         }
     },
 
-    // --- TEA (Chỉ size L) ---
+    // --- TEA  ---
     {
         id: 'tra_tac_sui', name: 'Hồng trà tắc sủi bọt', category: 'Tea', icon: '🍹',
         price: { L: 18000 },
@@ -218,9 +218,10 @@ const MENU = [
     },
     {
         id: 'tra_xao_cam', name: 'Trà Sào Cam Đả', category: 'Tea', icon: '🍊',
-        price: { L: 25000 },
+        price: { M: 20000, L: 25000 },
         hasAddonSua: false, hasAddonMatcha: false,
         congThuc: {
+            M: { nl_tradao: 150, nl_syrupdao: 30, nl_duong: 20, nl_tac: 1, nl_daomieng: 2, nl_tc_3q: 30, nl_ly_m: 1 },
             L: { nl_tradao: 200, nl_nuoc_cam: 40, nl_syrupdao: 30, nl_duong: 20, nl_tac: 1, nl_daomieng: 3, nl_tc_3q: 30, nl_ly_l: 1 }
         }
     },
@@ -234,7 +235,7 @@ const MENU = [
     },
     {
         id: 'tra_luu_hibiscus', name: 'Trà lựu hibiscus', category: 'Tea', icon: '🍹',
-        price: { L: 25000 },
+        price: { L: 28000 },
         hasAddonSua: false, hasAddonMatcha: false,
         congThuc: {
             L: { nl_tralai: 150, nl_siroluu: 20, nl_duong: 10, nl_siroatiso: 30, nl_tac: 1, nl_hatluu: 30, nl_thachdua: 30, nl_ly_l: 1 }
