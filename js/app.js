@@ -57,8 +57,8 @@ class RevenueHistory {
     getPeriod(dateObj) {
         let y = dateObj.getFullYear();
         let m = dateObj.getMonth();
-        // Nếu là ngày 1, nó vẫn thuộc chu kỳ của tháng trước
-        if (dateObj.getDate() < 2) {
+        // Nếu là ngày 1 và giờ < 1, nó vẫn thuộc chu kỳ của tháng trước (chưa tới 1h sáng)
+        if (dateObj.getDate() === 1 && dateObj.getHours() < 1) {
             m -= 1;
             if (m < 0) {
                 m = 11;
@@ -101,7 +101,7 @@ class RevenueHistory {
         localStorage.setItem(this.storageKey, JSON.stringify(this.data));
     }
 
-    checkMonthlyReset() {
+    checkMonthlyReset(isAutoCheck = false) {
         const now = new Date();
         const currentPeriod = this.getPeriod(now);
 
@@ -111,7 +111,18 @@ class RevenueHistory {
             this.data.lastResetMonth = currentPeriod.m;
             this.data.lastResetYear = currentPeriod.y;
             this.save();
-            console.log('Đã reset dữ liệu lịch sử doanh thu cho kỳ mới bắt đầu từ ngày 2!');
+
+            // Reset cả báo cáo ca hiện tại
+            let baocao = { tongThu: 0, tongLy: 0, tongChi: 0, chiTietBan: {}, orders: [], migratedGross: true };
+            localStorage.setItem('POS_BAOCAO', JSON.stringify(baocao));
+
+            console.log('Đã tự động reset dữ liệu tháng mới!');
+            if (isAutoCheck) {
+                if (typeof renderInventory === 'function') {
+                    renderInventory();
+                }
+                alert('Đã tự động reset dữ liệu cho tháng mới!');
+            }
         }
     }
 
@@ -163,6 +174,11 @@ class RevenueHistory {
 }
 const revenueHistory = new RevenueHistory();
 
+// Tự động kiểm tra reset mỗi phút
+setInterval(() => {
+    revenueHistory.checkMonthlyReset(true);
+}, 60000);
+
 // STATE
 let khoHienTai = JSON.parse(localStorage.getItem('POS_KHO'));
 let khoAo = JSON.parse(JSON.stringify(khoHienTai));
@@ -171,6 +187,22 @@ let currentMenu = JSON.parse(localStorage.getItem('POS_MENU'));
 if (!currentMenu) {
     currentMenu = JSON.parse(JSON.stringify(MENU));
     localStorage.setItem('POS_MENU', JSON.stringify(currentMenu));
+} else {
+    // Sync missing items from MENU to currentMenu
+    let isMenuUpdated = false;
+    MENU.forEach(defaultItem => {
+        let existing = currentMenu.find(m => m.id === defaultItem.id);
+        if (!existing) {
+            currentMenu.push(JSON.parse(JSON.stringify(defaultItem)));
+            isMenuUpdated = true;
+        } else if (existing.category !== defaultItem.category) {
+            existing.category = defaultItem.category;
+            isMenuUpdated = true;
+        }
+    });
+    if (isMenuUpdated) {
+        localStorage.setItem('POS_MENU', JSON.stringify(currentMenu));
+    }
 }
 
 let gioHang = [];

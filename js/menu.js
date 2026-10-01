@@ -102,6 +102,15 @@ const MENU = [
             L: { nl_cacao: 10, nl_sua_mlekovita: 150, nl_suadac: 50, nl_rich: 15, nl_nuoc_am: 50, nl_kemmuoi: 40, nl_ly_l: 1 }
         }
     },
+    {
+        id: 'cacao_kemdeo', name: 'Cacao Kem Dẻo', category: 'Cacao', icon: '🍦',
+        price: { M: 25000, L: 30000 },
+        hasAddonSua: true, hasAddonMatcha: false,
+        congThuc: {
+            M: { nl_cacao: 8, nl_sua_mlekovita: 100, nl_suadac: 30, nl_rich: 10, nl_nuoc_am: 40, nl_kemdeo: 30, nl_ly_m: 1 },
+            L: { nl_cacao: 10, nl_sua_mlekovita: 150, nl_suadac: 50, nl_rich: 15, nl_nuoc_am: 50, nl_kemdeo: 40, nl_ly_l: 1 }
+        }
+    },
 
     // --- NHÓM MATCHA ---
     {
@@ -240,5 +249,17 @@ const MENU = [
         congThuc: {
             L: { nl_tralai: 150, nl_siroluu: 20, nl_duong: 10, nl_siroatiso: 30, nl_tac: 1, nl_hatluu: 30, nl_thachdua: 30, nl_ly_l: 1 }
         }
+    },
+
+    // --- NƯỚC CAM ---
+    {
+        id: 'nuoc_cam', name: 'Nước Cam', category: 'Tea', icon: '🍊',
+        price: { M: 15000, L: 20000 },
+        hasAddonSua: false, hasAddonMatcha: false,
+        congThuc: {
+            M: { nl_cam: 2, nl_duong: 20, nl_ly_m: 1 },
+            L: { nl_cam: 2.5, nl_duong: 30, nl_ly_l: 1 }
+        }
     }
 ];
+

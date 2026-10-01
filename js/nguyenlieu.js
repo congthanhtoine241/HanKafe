@@ -36,6 +36,7 @@ const KHO_MAC_DINH = [
     { id: 'nl_oreo', name: 'Bánh Oreo', stock: 100, unit: 'cái' },
     { id: 'nl_sirobh', name: 'Siro Bạc Hà', stock: 1000, unit: 'ml' },
     { id: 'nl_tac', name: 'Tắc', stock: 1000, unit: 'trái' },
+    { id: 'nl_cam', name: "Cam", stock: 1000, unit: 'trái' },
     { id: 'nl_nuoc_cam', name: 'Nước Cam', stock: 1000, unit: 'ml' },
     { id: 'nl_nuoc_am', name: 'Nước Ấm', stock: 100000, unit: 'ml' },
     { id: 'nl_nuoc_dua', name: 'Nước Dừa', stock: 1000, unit: 'ml' },
@@ -62,6 +63,7 @@ const ADDONS = {
         { id: 'nl_suongsao', name: 'Sương sáo', price: 5000, qty: 30 },
         { id: 'nl_kemmuoi', name: 'Kem muối', price: 5000, qty: 30 },
         { id: 'nl_kemdeo', name: 'Kem dẻo', price: 5000, qty: 30 },
-        { id: 'nl_thachdua', name: 'Thạch dừa', price: 5000, qty: 30 }
+        { id: 'nl_thachdua', name: 'Thạch dừa', price: 5000, qty: 30 },
+        { id: 'nl_luu', name: 'Hạt lựu', price: 5000, qty: 30 }
     ]
 };
